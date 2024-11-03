@@ -3,18 +3,10 @@ using UnityEngine;
 
 public class DroneScript : MonoBehaviour
 {
-    public List<Vector3> positions = new List<Vector3>
-{
-    new Vector3(0, 0, 0),
-    new Vector3(2, 0, 1),
-    new Vector3(4, 0, 2),
-    new Vector3(6, 0, 0),
-    new Vector3(8, 1, -1),
-    new Vector3(10, 0, 0)
-};
+    public List<Vector3> positions;
     private int currentPositionIndex = 0;
 
-    public float speed = 1.0f;
+    public float speed;
 
     void Start()
     {

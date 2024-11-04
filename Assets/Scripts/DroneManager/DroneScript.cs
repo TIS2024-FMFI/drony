@@ -33,6 +33,6 @@ public class DroneScript : MonoBehaviour
         //         currentPositionIndex++;
         //     }
         // }
-        transform.position = trajectoryGenerator.GetPositionAtTime(Time.time);
+        transform.position = trajectoryGenerator.GetPositionAtTime(1);
     }
 }

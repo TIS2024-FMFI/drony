@@ -39,3 +39,16 @@ desktop.ini
 
 # Visual Studio Code workspace and settings files
 .vscode/
+.vsconfig
+
+# TextMesh Pro
+Assets/TextMesh 
+Assets/TextMesh Pro.meta
+/Assets/TextMesh Pro
+
+# Unity User Settings
+UserSettings/
+
+# specific project seeetings
+ProjectSettings/EditorBuildSettings.asset
+ProjectSettings/ShaderGraphSettings.asset

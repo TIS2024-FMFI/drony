@@ -52,3 +52,4 @@ UserSettings/
 # specific project seeetings
 ProjectSettings/EditorBuildSettings.asset
 ProjectSettings/ShaderGraphSettings.asset
+/.vs

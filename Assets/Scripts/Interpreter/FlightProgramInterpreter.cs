@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 public enum Command
 {
     SetPos,
@@ -11,8 +12,8 @@ public enum Command
     FlyTrajectory,
     Land,
     Hover,
-    EOF,
-    ERROR
+    Eof,
+    Error
 }
 
 public class FlightProgramInterpreter
@@ -25,7 +26,7 @@ public class FlightProgramInterpreter
     {
         _programLines = lines.ToList();
         _currentLine = 0;
-        _constants = [];
+        _constants = new Dictionary<string, string>();
     }
 
     private List<string>? NextLine()
@@ -34,39 +35,39 @@ public class FlightProgramInterpreter
             return null;
 
         var line = _programLines[_currentLine];
-        
+
         while (line.Trim() == "")
         {
             _currentLine++;
             line = _programLines[_currentLine];
         }
         _currentLine++;
-        
+
         var split = line.Trim().Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries).ToList();
         var commentIndex = split.FindIndex(elem => elem.Contains('#'));
         if (commentIndex < 0)
             return split;
 
-        return split[..commentIndex];
+        return split.Take(commandIndex).ToList();
     }
 
-    public (Command, List<string>) NextCommand()
+    public (DateTime, int, Command, List<string>) NextCommand()
     {
-        List<string>? line = NextLine();
+        var line = NextLine();
 
         while (line is not null && line.FirstOrDefault()?.ToLower() == "def")
         {
             var name = line[1];
-            var value = string.Join(" ", line[2..]);
+            var value = string.Join(" ", line.Skip(2));
             _constants[name] = value;
             line = NextLine();
         }
 
         if (line is null)
-            return (Command.EOF, []);
+            return (DateTime.Now, -1, Command.Eof, new List<string>());
 
-        var timestamp = line[0];
-        var droneId = line[1];
+        var timestamp = DateTime.Parse(line[0]);
+        var droneId = int.Parse(line[1]);
         var command = line[2] switch
         {
             "set-position" => Command.SetPos,
@@ -77,15 +78,15 @@ public class FlightProgramInterpreter
             "fly-trajectory" => Command.FlyTrajectory,
             "land" => Command.Land,
             "hover" => Command.Hover,
-            _ => Command.ERROR
+            _ => Command.Error
         };
 
-        List<string> args = [];
+        var args = new List<string>();
         if (line.Count >= 3)
         {
-            args = line[3..];
+            args = line.Skip(3).ToList();
         }
 
-        return (command, args);
+        return (timestamp, droneId, command, args);
     }
 }

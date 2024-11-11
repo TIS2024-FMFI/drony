@@ -2,25 +2,33 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-namespace Entities
+namespace Drony.Entities
 {
     public class DroneTrajectory 
     {
+        public string DroneId { get; set; }
         public List<DroneState> Trajectory { get; set; }
+        public int CurrentStateIndex { get; set; }
 
-        public DroneTrajectory() 
+        public DroneTrajectory(string droneID) 
         {
+            DroneId = droneID;
             Trajectory = new List<DroneState>();
+            CurrentStateIndex = 0;
         }
 
-        public DroneTrajectory(DroneState initialState)
+        public DroneTrajectory(string droneID, DroneState initialState)
         {
+            DroneId = droneID;
             Trajectory = new List<DroneState>() { initialState };
+            CurrentStateIndex = 0;
         }
 
-        public DroneTrajectory(List<DroneState> trajectory) 
+        public DroneTrajectory(string droneID, List<DroneState> trajectory) 
         {
+            DroneId = droneID;
             Trajectory = trajectory;
+            CurrentStateIndex = 0;
         }
 
         public void addTrajectory(List<DroneState> trajectory) 

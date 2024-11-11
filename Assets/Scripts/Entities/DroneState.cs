@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-namespace Entities
+namespace Drony.Entities
 {
     public class DroneState
     {

@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 public class TrajectoryGenerator
 {
+    private int resolution = 240;
     public List<Vector3> GenerateLinearTrajectory(Vector3 startPosition, Vector3 destinationPosition, int destinationYaw, int speed, TimeSpan time)
     {
         List<Vector3> trajectory = new List<Vector3>();

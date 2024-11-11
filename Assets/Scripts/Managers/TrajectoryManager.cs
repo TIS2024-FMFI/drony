@@ -7,7 +7,6 @@ using Drony.Entities;
 /// </summary>
 public class TrajectoryManager  : MonoBehaviour
 {
-    private int resolution = 240;
     private Dictionary<string, DroneTrajectory> drones;
 
     void Start()

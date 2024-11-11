@@ -1,19 +1,20 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Entities;
 
 public class TrajectoryGenerator : MonoBehaviour
 {
     int resolution = 240; // Would be enough to slowdown animation 4 times (0.25x)
     int index = 0;
 
-    private List<Vector3> trajectoryPoints;    // List of points representing the trajectory
+    private DroneTrajectory trajectoryPoints;    // List of points representing the trajectory
 
     void Start()
     {
-        trajectoryPoints = new List<Vector3>() {transform.position};
-        trajectoryPoints.AddRange(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1], new Vector3(3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
-        trajectoryPoints.AddRange(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1], new Vector3(-3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
+        trajectoryPoints = new DroneTrajectory(new DroneState(transform.position));
+        trajectoryPoints.addTrajectory(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1].Position, new Vector3(3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
+        trajectoryPoints.addTrajectory(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1].Position, new Vector3(-3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
     }
 
     private List<Vector3> GenerateLinearTrajectory(Vector3 startPosition, Vector3 destinationPosition, int destinationYaw, int speed, TimeSpan time)
@@ -32,6 +33,10 @@ public class TrajectoryGenerator : MonoBehaviour
         }
         return trajectory;
     }
+
+    // private void TriggerUnity() {
+    //     return;
+    // }
 
 
     public List<Vector3> GenerateCircularTrajectory(float radius, int numPoints)
@@ -55,9 +60,9 @@ public class TrajectoryGenerator : MonoBehaviour
     {
         index += playbackSpeed;
         if (index >= trajectoryPoints.Count) {
-            return trajectoryPoints[trajectoryPoints.Count-1];
+            return trajectoryPoints[trajectoryPoints.Count-1].Position;
         }
-        return trajectoryPoints[index];
+        return trajectoryPoints[index].Position;
     }
 
     // private void OnDrawGizmos()

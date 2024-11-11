@@ -48,7 +48,7 @@ public class FlightProgramInterpreter
         if (commentIndex < 0)
             return split;
 
-        return split.Take(commandIndex).ToList();
+        return split.Take(commentIndex).ToList();
     }
 
     public (DateTime, int, Command, List<string>) NextCommand()

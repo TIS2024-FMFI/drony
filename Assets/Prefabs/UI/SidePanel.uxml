@@ -1,0 +1,99 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Prefabs/UI/SidePanel.uss?fileID=7433441132597879392&amp;guid=70f9f64710a716b43bba5b2e73a5bbf5&amp;type=3#SidePanel" />
+    <ui:VisualElement name="container" class="container">
+        <ui:VisualElement name="side-panel" class="side-panel">
+            <ui:VisualElement name="header" class="header">
+                <ui:Label text="Simulation Settings" class="panel-title" />
+            </ui:VisualElement>
+            <ui:ScrollView name="content-scroll" mode="Vertical" class="scrollable-content">
+                <ui:VisualElement class="card">
+                    <ui:VisualElement class="card-header">
+                        <ui:Label text="Drone Command File" class="card-title" />
+                    </ui:VisualElement>
+                    <ui:Button text="Upload Command File" class="upload-button" name="upload-button" />
+                    <ui:Label text="Supported formats: .txt" name="file-name-label" class="support-text" />
+                </ui:VisualElement>
+                <ui:VisualElement class="card">
+                    <ui:VisualElement class="card-header">
+                        <ui:Label text="Playback Speed" class="card-title" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="slider-container">
+                        <ui:Label text="Speed: 1x" name="speed-label" class="slider-label" />
+                        <ui:SliderInt name="playback-slider" low-value="25" high-value="200" value="100" class="slider" />
+                        <ui:VisualElement class="slider-marks">
+                            <ui:Label text="0.25x" class="slider-mark" />
+                            <ui:Label text="1x" class="slider-mark" />
+                            <ui:Label text="2x" class="slider-mark" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="card">
+                    <ui:VisualElement class="card-header">
+                        <ui:Label text="Visual Settings" class="card-title" />
+                    </ui:VisualElement>
+                    <ui:Toggle label="Show Audio Visualization" name="show-waveform" class="toggle" />
+                </ui:VisualElement>
+                <ui:VisualElement class="card">
+                    <ui:VisualElement class="card-header">
+                        <ui:Label text="Wall Settings" class="card-title" />
+                    </ui:VisualElement>
+                    <ui:DropdownField name="wall-selector" label="Select Surface" class="dropdown" />
+                    <ui:VisualElement class="input-group">
+                        <ui:Label text="Surface Color" class="input-label" />
+                        <uie:ColorField name="wall-color" class="color-picker" />
+                    </ui:VisualElement>
+                    <ui:Button text="Upload Texture" class="upload-button" />
+                </ui:VisualElement>
+                <ui:VisualElement class="card">
+                    <ui:VisualElement class="card-header">
+                        <ui:Label text="Drone Settings" class="card-title" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="drone-toggles">
+                        <ui:Toggle label="Drone 1" name="drone1" class="toggle" />
+                        <ui:Toggle label="Drone 2" name="drone2" class="toggle" />
+                        <ui:Toggle label="Drone 3" name="drone3" class="toggle" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="drone-inputs">
+                        <ui:VisualElement class="input-group">
+                            <ui:Label text="Width (cm)" class="input-label" />
+                            <ui:FloatField name="drone-width" class="number-input" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="input-group">
+                            <ui:Label text="Height (cm)" class="input-label" />
+                            <ui:FloatField name="drone-height" class="number-input" />
+                        </ui:VisualElement>
+                        <ui:VisualElement class="input-group">
+                            <ui:Label text="Depth (cm)" class="input-label" />
+                            <ui:FloatField name="drone-depth" class="number-input" />
+                        </ui:VisualElement>
+                        <ui:Button text="Upload Drone Model (.sdl)" class="upload-button">
+                            <ui:VisualElement class="upload-icon" />
+                        </ui:Button>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="card">
+                    <ui:VisualElement class="card-header">
+                        <ui:Label text="Simulation Space Size" class="card-title" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="input-group">
+                        <ui:Label text="Width (m)" class="input-label" />
+                        <ui:FloatField name="width-input" class="number-input" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="input-group">
+                        <ui:Label text="Height (m)" class="input-label" />
+                        <ui:FloatField name="height-input" class="number-input" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="input-group">
+                        <ui:Label text="Depth (m)" class="input-label" />
+                        <ui:FloatField name="depth-input" class="number-input" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:ScrollView>
+            <ui:VisualElement name="footer" class="footer">
+                <ui:Button text="Save Settings" name="save-button" class="save-button" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="toggle-panel-button" class="toggle-panel-button">
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Drony.Entities;
 using UnityEngine;
 
 public class DroneScript : MonoBehaviour
@@ -39,6 +40,8 @@ public class DroneScript : MonoBehaviour
         //         currentPositionIndex++;
         //     }
         // }
-        transform.position = trajectoryManager.GetPositionAtTime(4, "1");
+        DroneState currentState = trajectoryManager.GetStateAtTime(4, "1");
+        transform.position = currentState.Position;
+        transform.rotation = currentState.YawAngle;
     }
 }

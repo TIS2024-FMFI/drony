@@ -10,6 +10,7 @@ public class TrajectoryManager
 {
     private Dictionary<string, DroneTrajectory> drones;
     private TrajectoryGenerator trajectoryGenerator;
+    private FlightProgramInterpreter flightProgramInterpreter;
 
     public TrajectoryManager()
     {
@@ -27,34 +28,35 @@ public class TrajectoryManager
         string droneId = "1";
         Vector3 startPosition1 = new Vector3(0,0,0);
         Vector3 destinationPosition1 = new Vector3(3,3,3);
-        int destinationYaw1 = 90; 
+        int startYaw1 = 0;
+        int destinationYaw1 = 110; 
         int speed1 = 2; 
 
         Vector3 destinationPosition2 = new Vector3(-3,3,3);
-        int destinationYaw2 = 90; 
+        int destinationYaw2 = 210; 
         int speed2 = 2; 
 
         Vector3 destinationPosition3 = new Vector3(0,0,0);
-        int destinationYaw3 = 90; 
+        int destinationYaw3 = 0; 
         int speed3 = 2; 
         
         DroneTrajectory firstDroneTrajectory = drones[droneId];
-        firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(startPosition1, destinationPosition1, destinationYaw1, speed1));
-        firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(destinationPosition1, destinationPosition2, destinationYaw2, speed2));
-        firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(destinationPosition2, destinationPosition3, destinationYaw3, speed3));
-
+        firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(startPosition1, destinationPosition1, startYaw1, destinationYaw1, speed1));
+        firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(destinationPosition1, destinationPosition2, destinationYaw1, destinationYaw2, speed2));
+        firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(destinationPosition2, destinationPosition3, destinationYaw2, destinationYaw3, speed3));
+        
 
     }
-    public Vector3 GetPositionAtTime(int playbackSpeed, string droneId)
+    public DroneState GetStateAtTime(int playbackSpeed, string droneId)
     {
         // TODO: there probably would be better to set the position to last state, when the trajectory
         // has been iterated
         try {
-            return drones[droneId].getNext(playbackSpeed).Position;
+            return drones[droneId].getNext(playbackSpeed);
         } catch(ArgumentOutOfRangeException) {
             // FIXME: ONLY for testing, i am reseting index, so the animation will loop
             drones[droneId].CurrentStateIndex = 0;
-            return drones[droneId].getNext(playbackSpeed).Position;
+            return drones[droneId].getNext(playbackSpeed);
         }
         
     }

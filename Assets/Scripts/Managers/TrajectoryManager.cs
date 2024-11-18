@@ -1,18 +1,21 @@
 using System;
 using System.Collections.Generic; 
 using Drony.Entities;
+using UnityEngine;
 /// <summary>
 /// Class <c>TrajectoryManager</c> manages logic for parser and generator 
-/// to create trajectories for each drone
+/// to create trajectories for each drone. It inherits from MonoBehaviour for drawing gizmos.
 /// </summary>
-public class TrajectoryManager  : MonoBehaviour
+public class TrajectoryManager
 {
     private Dictionary<string, DroneTrajectory> drones;
+    private TrajectoryGenerator trajectoryGenerator;
 
-    void Start()
+    public TrajectoryManager()
     {
         drones = new Dictionary<string, DroneTrajectory>();
         drones.Add("1", new DroneTrajectory("1"));
+        trajectoryGenerator = new TrajectoryGenerator(240);
         // trajectoryPoints = new DroneTrajectory(new DroneState(transform.position));
         // trajectoryPoints.addTrajectory(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1].Position, new Vector3(3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
         // trajectoryPoints.addTrajectory(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1].Position, new Vector3(-3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
@@ -20,18 +23,36 @@ public class TrajectoryManager  : MonoBehaviour
 
     public void LoadTrajectories(string filename)
     {
-        while (true) 
-        {
-            
-        }
+        // FIXME: just for testing:
+        string droneId = "1";
+        Vector3 startPosition1 = new Vector3(0,0,0);
+        Vector3 destinationPosition1 = new Vector3(3,3,3);
+        int destinationYaw1 = 90; 
+        int speed1 = 10; 
+
+        Vector3 destinationPosition2 = new Vector3(-3,-3,-3);
+        int destinationYaw2 = 90; 
+        int speed2 = 10; 
+
+        Vector3 destinationPosition3 = new Vector3(0,0,0);
+        int destinationYaw3 = 90; 
+        int speed3 = 10; 
+        
+        DroneTrajectory firstDroneTrajectory = drones[droneId];
+        firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(startPosition1, destinationPosition1, destinationYaw1, speed1));
+        firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(destinationPosition1, destinationPosition2, destinationYaw2, speed2));
+        firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(destinationPosition2, destinationPosition3, destinationYaw3, speed3));
+
+
     }
     public Vector3 GetPositionAtTime(int playbackSpeed, string droneId)
     {
-        // index += playbackSpeed * 4;
-        // if (index >= trajectoryPoints.Count) {
-        //     return trajectoryPoints[trajectoryPoints.Count-1].Position;
-        // }
-        // return trajectoryPoints[index].Position;
+        try {
+            return drones[droneId].getNext(playbackSpeed).Position;
+        } catch(ArgumentOutOfRangeException) {
+            return new Vector3(4,4,4);
+        }
+        
     }
 
     // TODO: add gizmos

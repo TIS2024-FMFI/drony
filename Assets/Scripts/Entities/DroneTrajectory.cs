@@ -24,10 +24,10 @@ namespace Drony.Entities
             CurrentStateIndex = 0;
         }
 
-        public DroneTrajectory(string droneID, List<DroneState> trajectory) 
+        public DroneTrajectory(string droneID, List<DroneState> initialTrajectory) 
         {
             DroneId = droneID;
-            Trajectory = trajectory;
+            Trajectory = initialTrajectory;
             CurrentStateIndex = 0;
         }
 
@@ -69,6 +69,16 @@ namespace Drony.Entities
                 
                 Trajectory[index] = value;
             }
+        }
+
+        public DroneState getNext(int playbackSpeed) {
+            if (CurrentStateIndex < 0 || CurrentStateIndex >= Trajectory.Count) {
+                // TODO: implement custom exception
+                throw new ArgumentOutOfRangeException(nameof(CurrentStateIndex), "Index is out of range.");
+            }
+            DroneState next = Trajectory[CurrentStateIndex];
+            CurrentStateIndex += playbackSpeed;
+            return next;
         }
     }
 }

@@ -7,8 +7,13 @@ using UnityEngine;
 /// </summary>
 public class TrajectoryGenerator
 {
-    private int resolution = 240;
-    public List<Vector3> GenerateLinearTrajectory(Vector3 startPosition, Vector3 destinationPosition, int destinationYaw, int speed, TimeSpan time)
+    private int resolution;
+
+    public TrajectoryGenerator(int resolution = 240) {
+        this.resolution = resolution;
+    }
+
+    public List<Vector3> GenerateLinearTrajectory(Vector3 startPosition, Vector3 destinationPosition, int destinationYaw, int speed)
     {
         List<Vector3> trajectory = new List<Vector3>();
         float distance = Vector3.Distance(startPosition, destinationPosition);

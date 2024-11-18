@@ -3,18 +3,24 @@ using UnityEngine;
 
 public class DroneScript : MonoBehaviour
 {
-    public List<Vector3> positions;
-    private TrajectoryGenerator trajectoryGenerator;
+    private TrajectoryManager trajectoryManager;
     private int currentPositionIndex = 0;
 
     public float speed;
 
+    public void Initialize(TrajectoryManager manager)
+    {
+        Debug.Log("I am initializing");
+        trajectoryManager = manager;
+    }
+
+
     void Start()
     {
-        trajectoryGenerator = gameObject.GetComponent<TrajectoryGenerator>();
-        if (trajectoryGenerator == null) {
-            trajectoryGenerator = gameObject.AddComponent<TrajectoryGenerator>();
-        }
+        // trajectoryGenerator = gameObject.GetComponent<TrajectoryGenerator>();
+        // if (trajectoryGenerator == null) {
+        //     trajectoryGenerator = gameObject.AddComponent<TrajectoryGenerator>();
+        // }
     }
 
     // Update is called once per frame
@@ -33,6 +39,6 @@ public class DroneScript : MonoBehaviour
         //         currentPositionIndex++;
         //     }
         // }
-        transform.position = trajectoryGenerator.GetPositionAtTime(1);
+        transform.position = trajectoryManager.GetPositionAtTime(4, "1");
     }
 }

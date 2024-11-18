@@ -23,20 +23,20 @@ public class TrajectoryManager
 
     public void LoadTrajectories(string filename)
     {
-        // FIXME: just for testing:
+        // FIXME: just for testing, cause we doesn't have Flight Program Interpreter implemented yet:
         string droneId = "1";
         Vector3 startPosition1 = new Vector3(0,0,0);
         Vector3 destinationPosition1 = new Vector3(3,3,3);
         int destinationYaw1 = 90; 
-        int speed1 = 10; 
+        int speed1 = 2; 
 
-        Vector3 destinationPosition2 = new Vector3(-3,-3,-3);
+        Vector3 destinationPosition2 = new Vector3(-3,3,3);
         int destinationYaw2 = 90; 
-        int speed2 = 10; 
+        int speed2 = 2; 
 
         Vector3 destinationPosition3 = new Vector3(0,0,0);
         int destinationYaw3 = 90; 
-        int speed3 = 10; 
+        int speed3 = 2; 
         
         DroneTrajectory firstDroneTrajectory = drones[droneId];
         firstDroneTrajectory.addTrajectory(trajectoryGenerator.GenerateLinearTrajectory(startPosition1, destinationPosition1, destinationYaw1, speed1));
@@ -47,10 +47,14 @@ public class TrajectoryManager
     }
     public Vector3 GetPositionAtTime(int playbackSpeed, string droneId)
     {
+        // TODO: there probably would be better to set the position to last state, when the trajectory
+        // has been iterated
         try {
             return drones[droneId].getNext(playbackSpeed).Position;
         } catch(ArgumentOutOfRangeException) {
-            return new Vector3(4,4,4);
+            // FIXME: ONLY for testing, i am reseting index, so the animation will loop
+            drones[droneId].CurrentStateIndex = 0;
+            return drones[droneId].getNext(playbackSpeed).Position;
         }
         
     }

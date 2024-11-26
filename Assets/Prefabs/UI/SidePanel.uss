@@ -57,13 +57,6 @@
     background-color: rgb(29, 78, 216);
 }
 
-.upload-icon {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-    background-image: resource("upload-icon"); /* icon treba */
-}
-
 .support-text {
     font-size: 12px;
     color: rgb(148, 163, 184);
@@ -82,16 +75,6 @@
 
 .slider {
     margin: 8px 0;
-}
-
-.slider-marks {
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.slider-mark {
-    font-size: 12px;
-    color: rgb(148, 163, 184);
 }
 
 .input-group {
@@ -133,10 +116,6 @@
 
 .drone-toggles {
     margin-bottom: 16px;
-}
-
-.drone-inputs {
-    display: none;
 }
 
 .drone-inputs.show {

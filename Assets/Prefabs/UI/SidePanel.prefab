@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 4659161918891389724}
   - component: {fileID: 6112106213562912477}
   - component: {fileID: -3355042717805777062}
+  - component: {fileID: 7244546620179192921}
+  - component: {fileID: 4766129984632109301}
   m_Layer: 5
   m_Name: SidePanel
   m_TagString: Untagged
@@ -75,5 +77,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b5df4654b1d188244819713bae231877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7244546620179192921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6933029436162063071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3d32fc5a86e63f45bf9e590c7357fda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4766129984632109301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6933029436162063071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 503d0f7d00cc2134a8fe4877e45c9dbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

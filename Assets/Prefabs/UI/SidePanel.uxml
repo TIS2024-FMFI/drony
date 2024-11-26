@@ -6,6 +6,7 @@
                 <ui:Label text="Simulation Settings" class="panel-title" />
             </ui:VisualElement>
             <ui:ScrollView name="content-scroll" mode="Vertical" class="scrollable-content">
+
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Drone Command File" class="card-title" />
@@ -13,26 +14,24 @@
                     <ui:Button text="Upload Command File" class="upload-button" name="upload-button" />
                     <ui:Label text="Supported formats: .txt" name="file-name-label" class="support-text" />
                 </ui:VisualElement>
+
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Playback Speed" class="card-title" />
                     </ui:VisualElement>
                     <ui:VisualElement class="slider-container">
                         <ui:Label text="Speed: 1x" name="speed-label" class="slider-label" />
-                        <ui:SliderInt name="playback-slider" low-value="25" high-value="200" value="100" class="slider" />
-                        <ui:VisualElement class="slider-marks">
-                            <ui:Label text="0.25x" class="slider-mark" />
-                            <ui:Label text="1x" class="slider-mark" />
-                            <ui:Label text="2x" class="slider-mark" />
-                        </ui:VisualElement>
+                        <ui:SliderInt name="playback-slider" low-value="0" high-value="6" value="3" class="slider" />
                     </ui:VisualElement>
                 </ui:VisualElement>
+
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Visual Settings" class="card-title" />
                     </ui:VisualElement>
                     <ui:Toggle label="Show Audio Visualization" name="show-waveform" class="toggle" />
                 </ui:VisualElement>
+
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Wall Settings" class="card-title" />
@@ -42,8 +41,10 @@
                         <ui:Label text="Surface Color" class="input-label" />
                         <uie:ColorField name="wall-color" class="color-picker" />
                     </ui:VisualElement>
-                    <ui:Button text="Upload Texture" class="upload-button" />
+                        <ui:Button text="Upload Wall Texture" name="wall-texture-upload" class="upload-button" />
+                            <ui:Label text="No texture loaded" name="wall-texture-label" class="support-text" />
                 </ui:VisualElement>
+
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Drone Settings" class="card-title" />
@@ -66,11 +67,11 @@
                             <ui:Label text="Depth (cm)" class="input-label" />
                             <ui:FloatField name="drone-depth" class="number-input" />
                         </ui:VisualElement>
-                        <ui:Button text="Upload Drone Model (.sdl)" class="upload-button">
-                            <ui:VisualElement class="upload-icon" />
-                        </ui:Button>
+                            <ui:Button text="Upload Drone Model (.sdl)" name="drone-model-upload" class="upload-button" />
+                            <ui:Label text="No model loaded" name="drone-model-label" class="support-text" />
                     </ui:VisualElement>
                 </ui:VisualElement>
+
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Simulation Space Size" class="card-title" />

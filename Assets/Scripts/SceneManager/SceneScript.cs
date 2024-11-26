@@ -11,10 +11,14 @@ public class SceneScript : MonoBehaviour
         trajectoryManager = new TrajectoryManager();
         trajectoryManager.LoadTrajectories("not fully implemented");
         var drones = Object.FindObjectsByType<DroneScript>(FindObjectsSortMode.None);
-        Debug.Log(drones);
+
+        // starting with id == 1, it initialize each drone with the corresponding id.
+        int currentId = 1;
         foreach (var drone in drones)
         {
-            drone.Initialize(trajectoryManager);
+            drone.Initialize(trajectoryManager, currentId.ToString());
+            currentId++;
         }
+        
     }
 }

@@ -6,19 +6,24 @@ using UnityEngine;
 
 namespace Interpreter
 {
-    /// <summary>
-    /// Class <c>TrajectoryManager</c> provides functions for generating different trajectory
-    /// </summary>
-    public class TrajectoryGenerator
-    {
+    public class TrajectoryGenerator {
         private int resolution;
 
-        public TrajectoryGenerator(int resolution = 240) {
+        public TrajectoryGenerator(int resolution = 1000) {
             this.resolution = resolution;
         }
 
-        public List<DroneState> GenerateLinearTrajectory(Vector3 startPosition, Vector3 destinationPosition, int startYaw, int destinationYaw, int speed)
-        {
+        public List<DroneState> GenerateHoverTrajectory(Vector3 postion, int startYaw, int timestamp, int duration) {
+            List<DroneState> trajectory = new List<DroneState>();
+            Quaternion yaw = Quaternion.Euler(0, startYaw, 0);
+            for (int i = 0; i <= duration; i++) {
+                DroneState currentState = new DroneState(postion, yaw, timestamp + i);
+                trajectory.Add(currentState);
+            }
+            return trajectory;
+        }
+
+        public List<DroneState> GenerateLinearTrajectory(Vector3 startPosition, Vector3 destinationPosition, int startYaw, int destinationYaw, int speed, int timestamp) {
             List<DroneState> trajectory = new List<DroneState>();
             float distance = Vector3.Distance(startPosition, destinationPosition);
             float totalTime = distance / speed;
@@ -53,4 +58,6 @@ namespace Interpreter
             return trajectory;
         }
     }
+
+
 }

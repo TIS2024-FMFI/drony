@@ -5,14 +5,16 @@ using UnityEngine;
 public class DroneScript : MonoBehaviour
 {
     private TrajectoryManager trajectoryManager;
+    private string id;
     private int currentPositionIndex = 0;
 
     public float speed;
 
-    public void Initialize(TrajectoryManager manager)
+    public void Initialize(TrajectoryManager manager, string droneId)
     {
-        Debug.Log("I am initializing");
+        Debug.Log($"Initializing drone with id: {droneId}");
         trajectoryManager = manager;
+        id = droneId;
     }
 
 
@@ -25,7 +27,7 @@ public class DroneScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate() // 100fps should be
     {
         // if (positions.Count > 0 && currentPositionIndex < positions.Count)
         // {
@@ -40,7 +42,7 @@ public class DroneScript : MonoBehaviour
         //         currentPositionIndex++;
         //     }
         // }
-        DroneState currentState = trajectoryManager.GetStateAtTime(4, "1");
+        DroneState currentState = trajectoryManager.GetStateAtTime(4, id);
         transform.position = currentState.Position;
         transform.rotation = currentState.YawAngle;
     }

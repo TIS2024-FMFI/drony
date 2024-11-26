@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Utility;
 
 namespace Drony.Entities
 {
@@ -31,15 +32,26 @@ namespace Drony.Entities
             CurrentStateIndex = 0;
         }
 
-        public void addTrajectory(List<DroneState> trajectory) 
+        public void addTrajectory(List<DroneState> newTrajectory) 
         {
-            Trajectory.AddRange(trajectory);
+            if (newTrajectory.Count == 0) {
+                return;
+            }
+            if (Trajectory.Count == 0) {
+                Trajectory.AddRange(newTrajectory);
+                return;
+            } 
+            int lastTime = Trajectory[Trajectory.Count - 1].Time;
+            int newStartTime = newTrajectory[0].Time;
+            if (lastTime < newStartTime) {
+                List<DroneState> hoverStates = 
+            }
         }
 
-        public void addTrajectory(List<Vector3> trajectory) 
+        public void addTrajectory(List<Vector3> newTrajectory) 
         {
-            for (int i = 0; i < trajectory.Count; i++) {
-                Trajectory.Add(new DroneState(trajectory[i]));
+            for (int i = 0; i < newTrajectory.Count; i++) {
+                Trajectory.Add(new DroneState(newTrajectory[i]));
             }
         }
 
@@ -72,12 +84,13 @@ namespace Drony.Entities
         }
 
         public DroneState getNext(int playbackSpeed) {
+            int gapInMillis = Utilities.ConvertFromPlaybackSpeedToMillisGap(playbackSpeed);
             if (CurrentStateIndex < 0 || CurrentStateIndex >= Trajectory.Count) {
                 // TODO: implement custom exception
                 throw new ArgumentOutOfRangeException(nameof(CurrentStateIndex), "Index is out of range.");
             }
             DroneState next = Trajectory[CurrentStateIndex];
-            CurrentStateIndex += playbackSpeed;
+            CurrentStateIndex += gapInMillis;
             return next;
         }
     }

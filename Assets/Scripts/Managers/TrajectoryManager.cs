@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic; 
 using Drony.Entities;
 using UnityEngine;
+using Interpreter;
+
 /// <summary>
 /// Class <c>TrajectoryManager</c> manages logic for parser and generator 
 /// to create trajectories for each drone. It inherits from MonoBehaviour for drawing gizmos.
@@ -10,7 +12,7 @@ public class TrajectoryManager
 {
     private Dictionary<string, DroneTrajectory> drones;
     private TrajectoryGenerator trajectoryGenerator;
-    private FlightProgramInterpreter flightProgramInterpreter;
+    private FlightProgramParser _flightProgramParser;
 
     public TrajectoryManager()
     {

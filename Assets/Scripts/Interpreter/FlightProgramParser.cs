@@ -38,22 +38,22 @@ namespace Interpreter
             return split.Take(commentIndex).ToList();
         }
 
-        public (DateTime, int, Command, List<object>) NextCommand()
+        public (TimeSpan, string, Command, List<object>) NextCommand()
         {
             var line = NextLine();
 
             if (line is null)
-                return (DateTime.Now, -1, Command.Eof, new List<object>());
+                return (TimeSpan.Zero, "-1", Command.Eof, new List<object>());
 
             if (line[0].ToLower() == "def")
             {
                 var name = line[1];
                 var value = string.Join(" ", line.Skip(2));
-                return (DateTime.Now, -1, Command.Constant, new List<object> { name, value });
+                return (TimeSpan.Zero, "-1", Command.Constant, new List<object> { name, value });
             }
             
-            DateTime.TryParse(line[1], out var timeStamp);
-            int.TryParse(line[1], out var droneId);
+            TimeSpan.TryParse(line[0], out var timeStamp);
+            string droneId = line[1];
             
             var command = line[2] switch
             {
@@ -70,6 +70,8 @@ namespace Interpreter
 
             var args = command switch
             {
+                Command.TakeOff => ParseTakeOffArgs(line.Skip(3).ToList()),
+                Command.SetPos => ParseSetPositionArgs(line.Skip(3).ToList()),
                 Command.FlyTo => ParseLinearTrajectoryArgs(line.Skip(3).ToList()),
                 _ => new List<object>()
             };
@@ -86,6 +88,20 @@ namespace Interpreter
             int.TryParse(args[3], out var destinationYaw);
             int.TryParse(args[4], out var speed); 
             return new List<object> { destinationPoint, destinationYaw, speed };
+        }
+
+        private List<object> ParseSetPositionArgs(List<string> args)
+        {
+            int.TryParse(args[0], out var x);
+            int.TryParse(args[1], out var y);
+            int.TryParse(args[2], out var z);
+            var startPoint = new Vector3(x, y, z);
+            return new List<object> {startPoint,};
+        }
+        private List<object> ParseTakeOffArgs(List<string> args)
+        {
+            int.TryParse(args[0], out var height);
+            return new List<object> {height,};
         }
     }
 }

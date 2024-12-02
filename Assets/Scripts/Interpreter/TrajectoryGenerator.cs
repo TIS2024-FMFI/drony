@@ -3,44 +3,119 @@ using System.Collections;
 using System.Collections.Generic;
 using Drony.Entities;
 using UnityEngine;
+using Utility;
 
 namespace Interpreter
 {
     public class TrajectoryGenerator {
         private int resolution;
+        private int MAX_FLIGHT_TIME = 3600000;
+        private int TAKEOFF_SPEED = 10; // FIXME: add an option to set it in config file or in ui
 
-        public TrajectoryGenerator(int resolution = 1000) {
+        public TrajectoryGenerator(int resolution = 1000) 
+        {
             this.resolution = resolution;
         }
 
-        public List<DroneState> GenerateHoverTrajectory(Vector3 postion, int startYaw, int timestamp, int duration) {
+        private List<DroneState> GenerateEmptyStates(int duration) 
+        {
             List<DroneState> trajectory = new List<DroneState>();
-            Quaternion yaw = Quaternion.Euler(0, startYaw, 0);
             for (int i = 0; i <= duration; i++) {
-                DroneState currentState = new DroneState(postion, yaw, timestamp + i);
+                DroneState currentState = new DroneState(i);
                 trajectory.Add(currentState);
             }
             return trajectory;
         }
 
-        public List<DroneState> GenerateLinearTrajectory(Vector3 startPosition, Vector3 destinationPosition, int startYaw, int destinationYaw, int speed, int timestamp) {
-            List<DroneState> trajectory = new List<DroneState>();
-            float distance = Vector3.Distance(startPosition, destinationPosition);
-            float totalTime = distance / speed;
-            int totalFrames = Mathf.CeilToInt(totalTime * resolution);
-            Quaternion startRotation = Quaternion.Euler(0, startYaw, 0);
+        public DroneTrajectory initDroneTrajectory(string droneId) 
+        {
+            return new DroneTrajectory(droneId, GenerateEmptyStates(MAX_FLIGHT_TIME));
+        }
+
+        public DroneTrajectory SetInitialDronePosition(
+                        DroneTrajectory droneTrajectory,
+                        int timestamp,
+                        List<object> cmdArguments)
+        {
+            Vector3 startPosition = (Vector3)cmdArguments[0];
+            int timeFrom = 0;
+            int timeTo = timestamp;
+            for (int i = timeFrom; i < timeTo + 1; i++) {
+                droneTrajectory[i].Position = startPosition;
+                droneTrajectory.LastStateIndex = i;
+            }
+            return droneTrajectory;
+        }
+
+        public DroneTrajectory GenerateTakeOffTrajectory(
+                        DroneTrajectory droneTrajectory,
+                        int timestamp,
+                        List<object> cmdArguments)
+        {
+            int height = (int)cmdArguments[0];
+
+            DroneState lastState = droneTrajectory.getLastAdded();
+            Vector3 lastPosition = lastState.Position;
+            Vector3 destinationPosition = new Vector3(lastPosition.x, lastPosition.y + height, lastPosition.z);
+            int defaultYaw = 0;  // FIXME: add possibility to set yaw in setPos command
+            List<object> cmdArgumentsForLinear = new List<object> {destinationPosition, defaultYaw, TAKEOFF_SPEED};
+            return GenerateLinearTrajectory(droneTrajectory, timestamp, cmdArgumentsForLinear);
+        }
+        
+
+        public DroneTrajectory GenerateHoverTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timeFrom, 
+                        int timeTo, 
+                        DroneState exampleState) 
+        {
+            
+            for (int i = timeFrom; i < timeTo + 1; i++) { // FIXME: timefrom + 1
+                droneTrajectory[i] = new DroneState(exampleState.Position, exampleState.YawAngle, i);
+                droneTrajectory.LastStateIndex = i;
+            }
+            return droneTrajectory;
+        }
+
+        public DroneTrajectory GenerateLinearTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        List<object> cmdArguments) 
+        {
+            Vector3 destinationPosition = (Vector3)cmdArguments[0];
+            int destinationYaw = (int)cmdArguments[1];
+            int speed = (int)cmdArguments[2];
+
+            DroneState lastState = droneTrajectory.getLastAdded();
+            int timeFrom = lastState.Time;
+            int timeTo = timestamp;
+            DroneTrajectory updatedDroneTrajectory = GenerateHoverTrajectory(
+                new DroneTrajectory(droneTrajectory), 
+                timeFrom, 
+                timeTo, 
+                lastState);
+            Vector3 startPosition = lastState.Position;
+            Quaternion startRotation = lastState.YawAngle;
+
+            int distanceMeters = (int)Vector3.Distance(startPosition, destinationPosition);
+            int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
+
+            float totalTime = distanceMillimeters / speed;
+            //int totalFrames = Mathf.CeilToInt(totalTime * resolution);
             Quaternion targetRotation = Quaternion.Euler(0, destinationYaw, 0);
 
             // interpolation between start and destination vectors
-            for (int i = 0; i <= totalFrames; i++)
+            for (int currentTime = timestamp; currentTime <= timestamp + totalTime; currentTime++)
             {
-                float t = i / (float)totalFrames;
+                float localTime = currentTime - timestamp;
+                float t = localTime / (float)totalTime;
                 Vector3 point = Vector3.Lerp(startPosition, destinationPosition, t);
                 Quaternion yaw = Quaternion.Slerp(startRotation, targetRotation, t);
-                DroneState currentState = new DroneState(point, yaw);
-                trajectory.Add(currentState);
+                updatedDroneTrajectory[currentTime].Position = point;
+                updatedDroneTrajectory[currentTime].YawAngle = yaw;
+                updatedDroneTrajectory.LastStateIndex = currentTime;
             }
-            return trajectory;
+            return updatedDroneTrajectory;
         }
 
         public List<Vector3> GenerateCircularTrajectory(float radius, int numPoints)

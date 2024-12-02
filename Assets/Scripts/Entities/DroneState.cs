@@ -36,5 +36,18 @@ namespace Drony.Entities
         {
             Position = position;
         }
+
+        public DroneState(int time) 
+        {
+            Time = time;
+        }
+
+        public DroneState(DroneState other)
+        {
+            Position = other.Position;
+            Color = other.Color;
+            YawAngle = other.YawAngle;
+            Time = other.Time;
+        }
     }
 }

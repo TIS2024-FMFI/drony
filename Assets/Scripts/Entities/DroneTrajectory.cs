@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using Utility;
+using Interpreter;
 
 namespace Drony.Entities
 {
@@ -9,42 +9,36 @@ namespace Drony.Entities
     {
         public string DroneId { get; set; }
         public List<DroneState> Trajectory { get; set; }
-        public int CurrentStateIndex { get; set; }
+        public int LastStateIndex { get; set; }
 
         public DroneTrajectory(string droneID) 
         {
             DroneId = droneID;
             Trajectory = new List<DroneState>();
-            CurrentStateIndex = 0;
+            LastStateIndex = 0;
         }
 
         public DroneTrajectory(string droneID, DroneState initialState)
         {
             DroneId = droneID;
             Trajectory = new List<DroneState>() { initialState };
-            CurrentStateIndex = 0;
+            LastStateIndex = 0;
         }
 
-        public DroneTrajectory(string droneID, List<DroneState> initialTrajectory) 
+        public DroneTrajectory(string droneID, List<DroneState> emptyTrajectory) 
         {
             DroneId = droneID;
-            Trajectory = initialTrajectory;
-            CurrentStateIndex = 0;
+            Trajectory = emptyTrajectory;
+            LastStateIndex = 0;  // the trajectory is empty, so there is no need to append LastStateIndex
         }
 
-        public void addTrajectory(List<DroneState> newTrajectory) 
+        public DroneTrajectory(DroneTrajectory other)
         {
-            if (newTrajectory.Count == 0) {
-                return;
-            }
-            if (Trajectory.Count == 0) {
-                Trajectory.AddRange(newTrajectory);
-                return;
-            } 
-            int lastTime = Trajectory[Trajectory.Count - 1].Time;
-            int newStartTime = newTrajectory[0].Time;
-            if (lastTime < newStartTime) {
-                List<DroneState> hoverStates = 
+            DroneId = other.DroneId;
+            LastStateIndex = other.LastStateIndex;
+            Trajectory = new List<DroneState>();
+            for (int i = 0; i < other.Count; i++) {
+                Trajectory.Add(other.Trajectory[i]);
             }
         }
 
@@ -58,6 +52,7 @@ namespace Drony.Entities
         public void addState(DroneState state) 
         {
             Trajectory.Add(state);
+            
         }
 
         public int Count
@@ -83,14 +78,18 @@ namespace Drony.Entities
             }
         }
 
-        public DroneState getNext(int playbackSpeed) {
-            int gapInMillis = Utilities.ConvertFromPlaybackSpeedToMillisGap(playbackSpeed);
-            if (CurrentStateIndex < 0 || CurrentStateIndex >= Trajectory.Count) {
+        public DroneState getLastAdded() {
+            return this[LastStateIndex];
+        }
+
+        public DroneState getNext(int playbackSpeed, int currentStateIndex) {
+            
+            if (currentStateIndex < 0 || currentStateIndex >= Trajectory.Count) {
                 // TODO: implement custom exception
-                throw new ArgumentOutOfRangeException(nameof(CurrentStateIndex), "Index is out of range.");
+                throw new ArgumentOutOfRangeException(nameof(currentStateIndex), "Index is out of range.");
             }
-            DroneState next = Trajectory[CurrentStateIndex];
-            CurrentStateIndex += gapInMillis;
+            DroneState next = Trajectory[currentStateIndex];
+            
             return next;
         }
     }

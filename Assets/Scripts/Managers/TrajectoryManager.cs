@@ -19,11 +19,8 @@ public class TrajectoryManager
     public TrajectoryManager()
     {
         drones = new Dictionary<string, DroneTrajectory>();
-        trajectoryGenerator = new TrajectoryGenerator(1000);
+        trajectoryGenerator = new TrajectoryGenerator();
         currentStateIndex = 0;
-        // trajectoryPoints = new DroneTrajectory(new DroneState(transform.position));
-        // trajectoryPoints.addTrajectory(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1].Position, new Vector3(3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
-        // trajectoryPoints.addTrajectory(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1].Position, new Vector3(-3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
     }
 
     public void LoadTrajectories(string fileDate)
@@ -31,10 +28,17 @@ public class TrajectoryManager
         IEnumerable<string> lines = new List<string>
         {
             "00:00:00 1 set-position 0 0 0",
-            "00:00:01 1 take-off 2",
-            "00:00:10 1 fly-to 3 3 3 120 10",
-            "00:00:20 1 fly-to -3 -3 3 240 10",
-            "00:00:30 1 fly-to 2 2 3 360 10"
+            "00:00:00 1 take-off 2",
+            "00:00:05 1 fly-to 3 3 3 90 2",
+            "00:00:10 1 fly-to -3 3 3 180 2",
+            "00:00:15 1 fly-to -3 3 0 270 2",
+            "00:00:20 1 fly-to 0 0 0 360 2",
+
+            "00:00:00 2 set-position 0 0 5",
+            "00:00:00 2 take-off 4",
+            "00:00:10 2 fly-to 0 3 -10 180 2",
+            "00:00:20 2 fly-to 0 3 3 270 2",
+            "00:00:30 2 fly-to 0 0 5 0 2"
         };
         _flightProgramParser = new FlightProgramParser(lines);
 
@@ -42,7 +46,7 @@ public class TrajectoryManager
         while (true) {
             (TimeSpan timestamp, string droneId, Command cmd, List<object> cmdArguments) = _flightProgramParser.NextCommand();
 
-            if (droneId == "-1") {
+            if (droneId == "") {
                 break;
             } if (!drones.ContainsKey(droneId)) {
                 drones[droneId] = trajectoryGenerator.initDroneTrajectory(droneId);

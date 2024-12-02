@@ -7,7 +7,7 @@ public class SceneScript : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("I am awake!");
+        Debug.Log("Start loading");
         trajectoryManager = new TrajectoryManager();
         trajectoryManager.LoadTrajectories("not fully implemented");
         var drones = Object.FindObjectsByType<DroneScript>(FindObjectsSortMode.None);
@@ -19,6 +19,6 @@ public class SceneScript : MonoBehaviour
             drone.Initialize(trajectoryManager, currentId.ToString());
             currentId++;
         }
-        
+        Debug.Log("End loading");
     }
 }

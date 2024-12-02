@@ -43,13 +43,13 @@ namespace Interpreter
             var line = NextLine();
 
             if (line is null)
-                return (TimeSpan.Zero, "-1", Command.Eof, new List<object>());
+                return (TimeSpan.Zero, "", Command.Eof, new List<object>());
 
             if (line[0].ToLower() == "def")
             {
                 var name = line[1];
                 var value = string.Join(" ", line.Skip(2));
-                return (TimeSpan.Zero, "-1", Command.Constant, new List<object> { name, value });
+                return (TimeSpan.Zero, "", Command.Constant, new List<object> { name, value });
             }
             
             TimeSpan.TryParse(line[0], out var timeStamp);

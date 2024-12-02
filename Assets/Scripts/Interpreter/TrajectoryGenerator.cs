@@ -8,14 +8,8 @@ using Utility;
 namespace Interpreter
 {
     public class TrajectoryGenerator {
-        private int resolution;
-        private int MAX_FLIGHT_TIME = 3600000;
-        private int TAKEOFF_SPEED = 10; // FIXME: add an option to set it in config file or in ui
-
-        public TrajectoryGenerator(int resolution = 1000) 
-        {
-            this.resolution = resolution;
-        }
+        private int MAX_FLIGHT_TIME = 3600000; // 1 hour
+        private int TAKEOFF_SPEED = 1; // FIXME: add an option to set it in config file or in ui
 
         private List<DroneState> GenerateEmptyStates(int duration) 
         {
@@ -62,14 +56,15 @@ namespace Interpreter
             return GenerateLinearTrajectory(droneTrajectory, timestamp, cmdArgumentsForLinear);
         }
         
-
         public DroneTrajectory GenerateHoverTrajectory(
                         DroneTrajectory droneTrajectory, 
                         int timeFrom, 
                         int timeTo, 
                         DroneState exampleState) 
         {
-            
+            if (timeFrom > timeTo) {
+                return droneTrajectory;
+            }
             for (int i = timeFrom; i < timeTo + 1; i++) { // FIXME: timefrom + 1
                 droneTrajectory[i] = new DroneState(exampleState.Position, exampleState.YawAngle, i);
                 droneTrajectory.LastStateIndex = i;
@@ -89,11 +84,13 @@ namespace Interpreter
             DroneState lastState = droneTrajectory.getLastAdded();
             int timeFrom = lastState.Time;
             int timeTo = timestamp;
+            
             DroneTrajectory updatedDroneTrajectory = GenerateHoverTrajectory(
                 new DroneTrajectory(droneTrajectory), 
                 timeFrom, 
                 timeTo, 
                 lastState);
+
             Vector3 startPosition = lastState.Position;
             Quaternion startRotation = lastState.YawAngle;
 

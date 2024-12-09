@@ -6,17 +6,29 @@ using Interpreter;
 using Utility;
 
 /// <summary>
-/// Class <c>TrajectoryManager</c> manages logic for parser and generator 
-/// to create trajectories for each drone. It inherits from MonoBehaviour for drawing gizmos.
+/// Singleton class <c>TrajectoryManager</c> manages logic for parser and generator 
+/// to create trajectories for each drone.
 /// </summary>
-public class TrajectoryManager
+public class TrajectoryManager 
 {
     private Dictionary<string, DroneTrajectory> drones;
     private int currentStateIndex;
     private TrajectoryGenerator trajectoryGenerator;
     private FlightProgramParser _flightProgramParser;
+    private static TrajectoryManager _instance;
+    public static TrajectoryManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new TrajectoryManager();
+            }
+            return _instance;
+        }
+    }
 
-    public TrajectoryManager()
+    private TrajectoryManager()
     {
         drones = new Dictionary<string, DroneTrajectory>();
         trajectoryGenerator = new TrajectoryGenerator();

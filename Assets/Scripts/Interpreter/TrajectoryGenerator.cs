@@ -8,14 +8,8 @@ using Utility;
 namespace Interpreter
 {
     public class TrajectoryGenerator {
-        private int resolution;
-        private int MAX_FLIGHT_TIME = 3600000;
-        private int TAKEOFF_SPEED = 10; // FIXME: add an option to set it in config file or in ui
-
-        public TrajectoryGenerator(int resolution = 1000) 
-        {
-            this.resolution = resolution;
-        }
+        private int MAX_FLIGHT_TIME = 3600000; // 1 hour
+        private int TAKEOFF_SPEED = 1; // FIXME: add an option to set it in config file or in ui
 
         private List<DroneState> GenerateEmptyStates(int duration) 
         {
@@ -62,14 +56,15 @@ namespace Interpreter
             return GenerateLinearTrajectory(droneTrajectory, timestamp, cmdArgumentsForLinear);
         }
         
-
         public DroneTrajectory GenerateHoverTrajectory(
                         DroneTrajectory droneTrajectory, 
                         int timeFrom, 
                         int timeTo, 
                         DroneState exampleState) 
         {
-            
+            if (timeFrom > timeTo) {
+                return droneTrajectory;
+            }
             for (int i = timeFrom; i < timeTo + 1; i++) { // FIXME: timefrom + 1
                 droneTrajectory[i] = new DroneState(exampleState.Position, exampleState.YawAngle, i);
                 droneTrajectory.LastStateIndex = i;
@@ -89,11 +84,13 @@ namespace Interpreter
             DroneState lastState = droneTrajectory.getLastAdded();
             int timeFrom = lastState.Time;
             int timeTo = timestamp;
+            
             DroneTrajectory updatedDroneTrajectory = GenerateHoverTrajectory(
                 new DroneTrajectory(droneTrajectory), 
                 timeFrom, 
                 timeTo, 
                 lastState);
+
             Vector3 startPosition = lastState.Position;
             Quaternion startRotation = lastState.YawAngle;
 
@@ -118,20 +115,39 @@ namespace Interpreter
             return updatedDroneTrajectory;
         }
 
-        public List<Vector3> GenerateCircularTrajectory(float radius, int numPoints)
+        public DroneTrajectory GenerateCircularTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        List<object> cmdArguments)
         {
-            List<Vector3> trajectory = new List<Vector3>();
-            
-            for (int i = 0; i < numPoints; i++)
-            {
-                float angle = i * Mathf.PI * 2 / numPoints;  
-                float x = Mathf.Cos(angle) * radius;
-                float z = Mathf.Sin(angle) * radius;
-                trajectory.Add(new Vector3(x, 0, z));            
-            }
-            
-            return trajectory;
+            throw new NotImplementedException("GenerateCircularTrajectory is not implemented yet.");
         }
+
+        public DroneTrajectory GenerateSinusTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        List<object> cmdArguments)
+        {
+            throw new NotImplementedException("GenerateSinusTrajectory is not implemented yet.");
+        }
+
+        public DroneTrajectory GenerateParabolaTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        List<object> cmdArguments)
+        {
+            throw new NotImplementedException("GenerateParabolaTrajectory is not implemented yet.");
+        }
+
+        public DroneTrajectory GeneratePointsTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        List<object> cmdArguments)
+        {
+            throw new NotImplementedException("GeneratePointsTrajectory is not implemented yet.");
+        }
+
+
     }
 
 

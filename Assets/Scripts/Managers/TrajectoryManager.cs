@@ -6,43 +6,66 @@ using Interpreter;
 using Utility;
 
 /// <summary>
-/// Class <c>TrajectoryManager</c> manages logic for parser and generator 
-/// to create trajectories for each drone. It inherits from MonoBehaviour for drawing gizmos.
+/// Singleton class <c>TrajectoryManager</c> manages logic for parser and generator 
+/// to create trajectories for each drone.
 /// </summary>
-public class TrajectoryManager
+public class TrajectoryManager 
 {
     private Dictionary<string, DroneTrajectory> drones;
     private int currentStateIndex;
     private TrajectoryGenerator trajectoryGenerator;
     private FlightProgramParser _flightProgramParser;
-
-    public TrajectoryManager()
+    private static TrajectoryManager _instance;
+    public static TrajectoryManager Instance
     {
-        drones = new Dictionary<string, DroneTrajectory>();
-        trajectoryGenerator = new TrajectoryGenerator(1000);
-        currentStateIndex = 0;
-        // trajectoryPoints = new DroneTrajectory(new DroneState(transform.position));
-        // trajectoryPoints.addTrajectory(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1].Position, new Vector3(3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
-        // trajectoryPoints.addTrajectory(GenerateLinearTrajectory(trajectoryPoints[trajectoryPoints.Count - 1].Position, new Vector3(-3,3,3), 50, 10, new TimeSpan(0, 0, 30, 0, 500)));
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new TrajectoryManager();
+            }
+            return _instance;
+        }
     }
 
-    public void LoadTrajectories(string fileDate)
+    private TrajectoryManager()
     {
-        IEnumerable<string> lines = new List<string>
-        {
-            "00:00:00 1 set-position 0 0 0",
-            "00:00:01 1 take-off 2",
-            "00:00:10 1 fly-to 3 3 3 120 10",
-            "00:00:20 1 fly-to -3 -3 3 240 10",
-            "00:00:30 1 fly-to 2 2 3 360 10"
-        };
-        _flightProgramParser = new FlightProgramParser(lines);
+        drones = new Dictionary<string, DroneTrajectory>();
+        trajectoryGenerator = new TrajectoryGenerator();
+        currentStateIndex = 0;
+    }
+
+    public void LoadTrajectories(List<string> droneCommands)
+    {   
+        // List<string> lines = new List<string>
+        // {
+        //     "00:00:00 1 set-position 0 0 0",
+        //     "00:00:00 1 take-off 2",
+        //     "00:00:05 1 fly-to 3 3 3 90 2",
+        //     "00:00:10 1 fly-to -3 3 3 180 2",
+        //     "00:00:15 1 fly-to -3 3 0 270 2",
+        //     "00:00:20 1 fly-to 0 0 0 360 2",
+
+        //     "00:00:00 2 set-position 0 0 5",
+        //     "00:00:00 2 take-off 4",
+        //     "00:00:10 2 fly-to 0 3 -10 180 2",
+        //     "00:00:20 2 fly-to 0 3 3 270 2",
+        //     "00:00:30 2 fly-to 0 10 5 0 2",
+
+        //     "00:00:00 3 set-position 1 0 1",
+        //     "00:00:00 3 take-off 1",
+        //     "00:00:10 3 fly-to 3 1 3 0 4",
+        //     "00:00:15 3 fly-to -3 1 3 0 4",
+        //     "00:00:20 3 fly-to -3 1 -3 0 4",
+        //     "00:00:25 3 fly-to 3 1 -3 0 4",
+        // };
+        _flightProgramParser = new FlightProgramParser(droneCommands);
 
 
         while (true) {
             (TimeSpan timestamp, string droneId, Command cmd, List<object> cmdArguments) = _flightProgramParser.NextCommand();
 
-            if (droneId == "-1") {
+            if (droneId == "") {
                 break;
             } if (!drones.ContainsKey(droneId)) {
                 drones[droneId] = trajectoryGenerator.initDroneTrajectory(droneId);

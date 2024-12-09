@@ -9,7 +9,7 @@ public class SceneScript : MonoBehaviour
     {
         Debug.Log("Start loading");
         trajectoryManager = TrajectoryManager.Instance;
-        trajectoryManager.LoadTrajectories("not fully implemented");
+        //trajectoryManager.LoadTrajectories("not fully implemented");
         var drones = Object.FindObjectsByType<DroneScript>(FindObjectsSortMode.None);
 
         // starting with id == 1, it initialize each drone with the corresponding id.

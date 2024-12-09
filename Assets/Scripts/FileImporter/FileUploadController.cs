@@ -17,9 +17,11 @@ public class FileUploadController : MonoBehaviour
 
     private Button uploadDroneModelButton;
     private Label droneModelLabel;
+    private UIManager uimanager;
 
     void OnEnable()
     {
+        uimanager = UIManager.Instance;
         var root = GetComponent<UIDocument>().rootVisualElement;
 
         // Command File
@@ -50,15 +52,21 @@ public class FileUploadController : MonoBehaviour
         }
 #endif
     }
-
+    // Tento komentar sluzi na vysvetlenie myslenky toho, co som (Artemii) tu spravil.
+    // Vymaz ho potom.
+    // Pointa je, ze nespracujem vsetko v jednom FileUploadController. Tato trieda sluzi skor len
+    // na to, aby pristupovat/upravovat/obsluhovat UI komponenty.
+    // Ale samotna logika spracovania akcii sa nachadza v UIManager. 
+    // UIManager uz ma samotne spracovanie poziadaviek/akcii. Tam on ma pristup aj
+    // k inym komponentam programy. 
+    // Ja som to rozdielil len na to, aby sme mali nejaky akokeby "frontend" a "backend",
+    // kde rozne skripty ako ten "FileUploadController" budu 1 vrstvou pri komunikacie z pouzivatelom
+    // a budu manazovat rozne Labely, Buttony, Togglery, atd. Ale Managery ako UIManager, MusicManager,
+    // TrajectoryManager uz budu riesit biznis logiku aplikacie.
     private void ProcessCommandFile(string path)
     {
-        commandFilePath = path;
-        commandFileNameLabel.text = $"Loaded: {Path.GetFileName(path)}";
-        Debug.Log($"Command File Loaded: {path}");
-        // spracovat obsah
-        string content = File.ReadAllText(path);
-        Debug.Log($"Command File Content: {content}");
+        uimanager.ProcessCommandFile(path);
+        commandFileNameLabel.text = uimanager.GetCommandFileName();
     }
 
     private void ProcessWallTexture(string path)

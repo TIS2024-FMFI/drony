@@ -1,7 +1,10 @@
 using Unity.VisualScripting;
 using System.IO;
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Utility
 {
@@ -25,6 +28,10 @@ namespace Utility
         public static byte[] ReadByteFile(string path)
         {
             return File.ReadAllBytes(path);
+        }
+        public static List<string> GetLinesFromString(string data)
+        {
+            return data.Split(new[] { '\n' }, StringSplitOptions.None).ToList();
         }
     }
 }

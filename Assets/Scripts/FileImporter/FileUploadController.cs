@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UIElements;
 using System.IO;
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR
+using System.Runtime.InteropServices;
 using SFB; // Na nahrávanie súborov cez natívny dialog
-#endif
+using UnityEngine.Networking;
 
 public class FileUploadController : MonoBehaviour
 {

@@ -23,5 +23,30 @@ public class UIManager
             return _instance;
         }
     }
+
+    public void UpdatePlaybackSpeed()
+    {
+        throw new NotImplementedException("GeneratePointsTrajectory is not implemented yet.");
+    }
+
+    public void ProcessCommandFile(string path)
+    {
+        throw new NotImplementedException("GeneratePointsTrajectory is not implemented yet.");
+    }
+
+    public void ProcessWallTexture(string path)
+    {
+        throw new NotImplementedException("GeneratePointsTrajectory is not implemented yet.");
+    }
+
+    public void ProcessDroneModel(string path)
+    {
+        throw new NotImplementedException("GeneratePointsTrajectory is not implemented yet.");
+    }
+
+    public void ProcessMusicFile(string path)
+    {
+        throw new NotImplementedException("GeneratePointsTrajectory is not implemented yet.");
+    }
 }
 

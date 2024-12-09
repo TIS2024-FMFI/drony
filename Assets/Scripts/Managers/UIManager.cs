@@ -37,6 +37,7 @@ public class UIManager
     public void ProcessCommandFile(string path)
     {
         string content = Utilities.ReadTextFile(path);
+        // tu ma byt ten CommandFilePreprocessor (alebo CommandFileSplitter), ktory to sikovne splittne
         List<string> fileLines = Utilities.GetLinesFromString(content);
         trajectoryManager.LoadTrajectories(fileLines);
         commandFileName = $"Loaded: {Path.GetFileName(path)}";

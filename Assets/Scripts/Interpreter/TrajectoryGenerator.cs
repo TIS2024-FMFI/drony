@@ -115,20 +115,39 @@ namespace Interpreter
             return updatedDroneTrajectory;
         }
 
-        public List<Vector3> GenerateCircularTrajectory(float radius, int numPoints)
+        public DroneTrajectory GenerateCircularTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        List<object> cmdArguments)
         {
-            List<Vector3> trajectory = new List<Vector3>();
-            
-            for (int i = 0; i < numPoints; i++)
-            {
-                float angle = i * Mathf.PI * 2 / numPoints;  
-                float x = Mathf.Cos(angle) * radius;
-                float z = Mathf.Sin(angle) * radius;
-                trajectory.Add(new Vector3(x, 0, z));            
-            }
-            
-            return trajectory;
+            throw new NotImplementedException("GenerateCircularTrajectory is not implemented yet.");
         }
+
+        public DroneTrajectory GenerateSinusTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        List<object> cmdArguments)
+        {
+            throw new NotImplementedException("GenerateSinusTrajectory is not implemented yet.");
+        }
+
+        public DroneTrajectory GenerateParabolaTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        List<object> cmdArguments)
+        {
+            throw new NotImplementedException("GenerateParabolaTrajectory is not implemented yet.");
+        }
+
+        public DroneTrajectory GeneratePointsTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        List<object> cmdArguments)
+        {
+            throw new NotImplementedException("GeneratePointsTrajectory is not implemented yet.");
+        }
+
+
     }
 
 

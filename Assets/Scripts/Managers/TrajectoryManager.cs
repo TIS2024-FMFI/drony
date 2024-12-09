@@ -38,7 +38,14 @@ public class TrajectoryManager
             "00:00:00 2 take-off 4",
             "00:00:10 2 fly-to 0 3 -10 180 2",
             "00:00:20 2 fly-to 0 3 3 270 2",
-            "00:00:30 2 fly-to 0 0 5 0 2"
+            "00:00:30 2 fly-to 0 10 5 0 2",
+
+            "00:00:00 3 set-position 1 0 1",
+            "00:00:00 3 take-off 1",
+            "00:00:10 3 fly-to 3 1 3 0 4",
+            "00:00:15 3 fly-to -3 1 3 0 4",
+            "00:00:20 3 fly-to -3 1 -3 0 4",
+            "00:00:25 3 fly-to 3 1 -3 0 4",
         };
         _flightProgramParser = new FlightProgramParser(lines);
 

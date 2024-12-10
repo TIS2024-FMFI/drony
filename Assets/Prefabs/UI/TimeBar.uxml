@@ -1,0 +1,16 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Prefabs/UI/TimeBar.uss?fileID=7433441132597879392&amp;guid=dc8394db1d70f9349b79a1c7acb1b7a4&amp;type=3#TimeBar" />
+    
+<engine:VisualElement name="time-player" class="time-player">
+    <engine:VisualElement name="controls-container" class="controls-container">
+        <engine:Button name="play-pause-button" text="Play" class="control-button" />
+        <engine:Button name="restart-button" text="Restart" class="control-button" />
+    </engine:VisualElement>
+    <engine:VisualElement name="time-container" class="time-container">
+        <engine:Label name="current-time" text="0:00:00" class="time-label current-time" />
+        <engine:Label name="total-time" text="0:00:00" class="time-label total-time" />
+    </engine:VisualElement>
+    <engine:ProgressBar name="time-progress" class="time-progress" />
+</engine:VisualElement>
+
+</engine:UXML>

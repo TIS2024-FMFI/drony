@@ -103,6 +103,11 @@ public class TrajectoryManager
             currentStateIndex += gapInMillis;
             return currentDroneState;
     }
+    public List<string> GetDroneIds() {
+        List<string> ids = new List<string>();
+        ids.AddRange(drones.Keys);
+        return ids;
+    }
     public DroneState GetStateAtTime(int playbackSpeed, string droneId)
     {
         try {

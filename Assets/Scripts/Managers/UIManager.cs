@@ -40,6 +40,11 @@ public class UIManager
         // tu ma byt ten CommandFilePreprocessor (alebo CommandFileSplitter), ktory to sikovne splittne
         List<string> fileLines = Utilities.GetLinesFromString(content);
         trajectoryManager.LoadTrajectories(fileLines);
+        List<string> droneIds = trajectoryManager.GetDroneIds();
+        foreach (var id in droneIds)
+        {
+            DroneSpawner.Instance.SpawnDrone(id);
+        }
         commandFileName = $"Loaded: {Path.GetFileName(path)}";
     }
 

@@ -30,7 +30,7 @@ public class SidePanelToggle : MonoBehaviour
         if (isPanelVisible)
         {
             sidePanel.RemoveFromClassList("hidden");
-            toggleButton.style.left = 300;
+            toggleButton.style.left = 400;
             toggleButton.text = "<";
         }
         else

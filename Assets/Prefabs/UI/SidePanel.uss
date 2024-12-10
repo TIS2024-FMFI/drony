@@ -1,6 +1,6 @@
 ﻿    .side-panel {
-        min-width: 300px;
-        max-width: 300px; /* Maximálna šírka panela */
+        min-width: 400px;
+        max-width: 400px; /* Maximálna šírka panela */
         background-color: rgb(15, 23, 42);
         border-left-color: rgb(51, 65, 85);
         border-left-width: 1px;
@@ -186,7 +186,7 @@
 
     .toggle-panel-button {
         position: absolute;
-        left: 300px;
+        left: 400px;
         top: 50%;
         translate: 0 -50%;
         width: 32px;

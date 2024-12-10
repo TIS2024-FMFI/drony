@@ -11,10 +11,10 @@ public class DroneScript : MonoBehaviour
 
     public float speed;
 
-    public void Initialize(TrajectoryManager manager, string droneId)
+    public void Initialize(string droneId)
     {
         Debug.Log($"Initializing drone with id: {droneId}");
-        trajectoryManager = manager;
+        trajectoryManager = TrajectoryManager.Instance;
         id = droneId;
     }
 

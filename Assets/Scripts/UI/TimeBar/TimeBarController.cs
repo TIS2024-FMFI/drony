@@ -37,6 +37,7 @@ public class TimeBarController : MonoBehaviour
         if (isTiming)
         {
             currentTime += Time.deltaTime * timeMultiplier;
+            Debug.Log(currentTime);
             if (currentTime >= totalTimeLength)
             {
                 currentTime = totalTimeLength;
@@ -51,6 +52,7 @@ public class TimeBarController : MonoBehaviour
 
     private void TogglePlayPause()
     {
+        Debug.Log("toggle");
         isTiming = !isTiming;
         playPauseButton.text = isTiming ? "Pause" : "Play";
     }

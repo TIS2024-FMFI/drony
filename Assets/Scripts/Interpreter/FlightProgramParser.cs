@@ -73,6 +73,7 @@ namespace Interpreter
                 Command.TakeOff => ParseTakeOffArgs(line.Skip(3).ToList()),
                 Command.SetPos => ParseSetPositionArgs(line.Skip(3).ToList()),
                 Command.FlyTo => ParseLinearTrajectoryArgs(line.Skip(3).ToList()),
+                Command.FlySpiral => ParseSpiralTrajectoryArgs(line.Skip(3).ToList()),
                 _ => new List<object>()
             };
             
@@ -98,10 +99,32 @@ namespace Interpreter
             var startPoint = new Vector3(x, y, z);
             return new List<object> {startPoint,};
         }
+
         private List<object> ParseTakeOffArgs(List<string> args)
         {
             int.TryParse(args[0], out var height);
             return new List<object> {height,};
+        }
+        
+        private List<object> ParseSpiralTrajectoryArgs(List<string> args)
+        {
+            int.TryParse(args[0], out var x);
+            int.TryParse(args[1], out var y);
+            int.TryParse(args[2], out var z);
+            var destinationPoint = new Vector3(x, y, z);
+            int.TryParse(args[3], out var xA);
+            int.TryParse(args[4], out var yA);
+            int.TryParse(args[5], out var zA);
+            var pointA = new Vector3(xA, yA, zA);
+            int.TryParse(args[6], out var xB);
+            int.TryParse(args[7], out var yB);
+            int.TryParse(args[8], out var zB);
+            var pointB = new Vector3(xB, yB, zB);
+            int.TryParse(args[9], out var clockwise);
+            bool isClockwise = clockwise == 1;
+            int.TryParse(args[10], out var numberOfRevolutions);
+            int.TryParse(args[11], out var speed);
+            return new List<object> { destinationPoint, pointA, pointB, isClockwise, numberOfRevolutions, speed };
         }
     }
 }

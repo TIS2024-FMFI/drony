@@ -37,9 +37,9 @@ public class UIManager
     public void ProcessCommandFile(string path)
     {
         string content = Utilities.ReadTextFile(path);
-        // tu ma byt ten CommandFilePreprocessor (alebo CommandFileSplitter), ktory to sikovne splittne
-        List<string> fileLines = Utilities.GetLinesFromString(content);
-        trajectoryManager.LoadTrajectories(fileLines);
+        CommandFileSplitter commandFileSplitter = new CommandFileSplitter(content);
+        List<string> commandSection = commandFileSplitter.GetCommandSection();
+        trajectoryManager.LoadTrajectories(commandSection);
         List<string> droneIds = trajectoryManager.GetDroneIds();
         foreach (var id in droneIds)
         {

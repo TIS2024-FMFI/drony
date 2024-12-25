@@ -23,9 +23,11 @@ namespace Interpreter
 
             var line = _programLines[_currentLine];
 
-            while (line.Trim() == "")
+            while (line.Trim() == "" || line.Trim()[0] == '#')
             {
                 _currentLine++;
+                if (_currentLine >= _programLines.Count)
+                    return null;
                 line = _programLines[_currentLine];
             }
             _currentLine++;

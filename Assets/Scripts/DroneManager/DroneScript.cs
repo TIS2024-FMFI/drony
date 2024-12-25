@@ -8,6 +8,7 @@ public class DroneScript : MonoBehaviour
     private string id;
     private int currentPositionIndex = 0;
     private float startTime;
+    private List<Vector3> markerPositions = new List<Vector3>();
 
     public float speed;
 
@@ -30,12 +31,27 @@ public class DroneScript : MonoBehaviour
         DroneState currentState = trajectoryManager.GetStateAtTime(1, id);
         transform.position = currentState.Position;
         transform.rotation = currentState.YawAngle;
+        currentPositionIndex++;
+        AddMarker(transform.position);
+
+        // for debugging:
         // if (currentState.Time % 10000 == 0) {
         //     float elapsedTime = Time.time - startTime;
         //     Debug.Log($"Elapsed time: {elapsedTime} seconds");
         // }
-        currentPositionIndex++;
-        
+    }
 
+    public void AddMarker(Vector3 position)
+    {
+        markerPositions.Add(position);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        foreach (Vector3 position in markerPositions)
+        {
+            Gizmos.DrawSphere(position, 0.05f); // Draw small red spheres
+        }
     }
 }

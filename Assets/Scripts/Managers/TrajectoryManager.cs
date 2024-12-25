@@ -71,6 +71,12 @@ public class TrajectoryManager
                         timestampMilliseconds,
                         cmdArguments);
                     break;
+                case Command.FlySpiral:
+                    drones[droneId] = trajectoryGenerator.GenerateSpiralTrajectory(
+                        droneTrajectory,
+                        timestampMilliseconds,
+                        cmdArguments);
+                    break;
                 
             }     
         }

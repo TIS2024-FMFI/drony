@@ -6,16 +6,15 @@
                 <ui:Label text="Simulation Settings" class="panel-title" />
             </ui:VisualElement>
             <ui:ScrollView name="content-scroll" mode="Vertical" class="scrollable-content">
-
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Drone Command File" class="card-title" />
                     </ui:VisualElement>
-                    <ui:Button text="Upload Command File" class="upload-button" name="upload-button" />
+                    <ui:Button text="Upload Command File" name="upload-button" class="upload-button" />
                     <ui:Label text="Supported formats: .txt" name="file-name-label" class="support-text" />
                 </ui:VisualElement>
-
                 <ui:VisualElement class="card">
+                    <ui:Button text="Upload Music File" name="upload-music-button" class="upload-music-button" />
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Playback Speed" class="card-title" />
                     </ui:VisualElement>
@@ -24,14 +23,12 @@
                         <ui:SliderInt name="playback-slider" low-value="0" high-value="6" value="3" class="slider" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Visual Settings" class="card-title" />
                     </ui:VisualElement>
                     <ui:Toggle label="Show Audio Visualization" name="show-waveform" class="toggle" />
                 </ui:VisualElement>
-
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Wall Settings" class="card-title" />
@@ -41,10 +38,9 @@
                         <ui:Label text="Surface Color" class="input-label" />
                         <uie:ColorField name="wall-color" class="color-picker" />
                     </ui:VisualElement>
-                        <ui:Button text="Upload Wall Texture" name="wall-texture-upload" class="upload-button" />
-                            <ui:Label text="No texture loaded" name="wall-texture-label" class="support-text" />
+                    <ui:Button text="Upload Wall Texture" name="wall-texture-upload" class="upload-button" />
+                    <ui:Label text="No texture loaded" name="wall-texture-label" class="support-text" />
                 </ui:VisualElement>
-
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Drone Settings" class="card-title" />
@@ -67,11 +63,10 @@
                             <ui:Label text="Depth (cm)" class="input-label" />
                             <ui:FloatField name="drone-depth" class="number-input" />
                         </ui:VisualElement>
-                            <ui:Button text="Upload Drone Model (.sdl)" name="drone-model-upload" class="upload-button" />
-                            <ui:Label text="No model loaded" name="drone-model-label" class="support-text" />
+                        <ui:Button text="Upload Drone Model (.sdl)" name="drone-model-upload" class="upload-button" />
+                        <ui:Label text="No model loaded" name="drone-model-label" class="support-text" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-
                 <ui:VisualElement class="card">
                     <ui:VisualElement class="card-header">
                         <ui:Label text="Simulation Space Size" class="card-title" />
@@ -94,7 +89,6 @@
                 <ui:Button text="Save Settings" name="save-button" class="save-button" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Button name="toggle-panel-button" class="toggle-panel-button">
-        </ui:Button>
+        <ui:Button name="toggle-panel-button" class="toggle-panel-button" />
     </ui:VisualElement>
 </ui:UXML>

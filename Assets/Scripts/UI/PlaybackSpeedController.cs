@@ -7,6 +7,7 @@ public class PlaybackSpeedController : MonoBehaviour
     private Label speedLabel;
     private SliderInt playbackSlider;
     private TimeBarController timeBarController;
+    private AudioManager audioManager;
 
     void OnEnable()
     {
@@ -15,8 +16,8 @@ public class PlaybackSpeedController : MonoBehaviour
         speedLabel = root.Q<Label>("speed-label");
         playbackSlider = root.Q<SliderInt>("playback-slider");
 
-        timeBarController = FindAnyObjectByType<TimeBarController>();
-
+        timeBarController = FindObjectOfType<TimeBarController>();
+        audioManager = AudioManager.Instance;
 
         playbackSlider.lowValue = 0;
         playbackSlider.highValue = speedValues.Length - 1;
@@ -37,6 +38,11 @@ public class PlaybackSpeedController : MonoBehaviour
         if (timeBarController != null)
         {
             timeBarController.SetTimeMultiplier(speed);
+        }
+
+        if (audioManager != null)
+        {
+            audioManager.SetPlaybackSpeed(speed);
         }
     }
 }

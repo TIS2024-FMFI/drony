@@ -9,7 +9,7 @@ public class TimeBarController : MonoBehaviour
     private Button playPauseButton;
     private Button restartButton;
 
-    private float totalTimeLength = 180f; //3 min
+    private float totalTimeLength = 180f; // 3 minutes
     private float currentTime = 0f;
     private bool isTiming = false;
     private float timeMultiplier = 1f;
@@ -17,7 +17,6 @@ public class TimeBarController : MonoBehaviour
     void Start()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
-
 
         currentTimeLabel = root.Q<Label>("current-time");
         totalTimeLabel = root.Q<Label>("total-time");
@@ -34,15 +33,18 @@ public class TimeBarController : MonoBehaviour
 
     void Update()
     {
+        
         if (isTiming)
         {
             currentTime += Time.deltaTime * timeMultiplier;
-            Debug.Log(currentTime);
+
+            // Check if the music has finished and stop the timer
             if (currentTime >= totalTimeLength)
             {
                 currentTime = totalTimeLength;
                 isTiming = false;
                 playPauseButton.text = "Play";
+                RestartTimer();
             }
 
             UpdateCurrentTime(currentTime);
@@ -52,9 +54,24 @@ public class TimeBarController : MonoBehaviour
 
     private void TogglePlayPause()
     {
-        Debug.Log("toggle");
-        isTiming = !isTiming;
-        playPauseButton.text = isTiming ? "Pause" : "Play";
+        if (AudioManager.Instance.GetAudioLength() != 0.0f)
+        {
+            totalTimeLength = AudioManager.Instance.GetAudioLength();
+            SetTotalTime(totalTimeLength);
+        }
+
+        if (!AudioManager.Instance.GetAudioSource().isPlaying)
+        {
+            AudioManager.Instance.PlayAudio();
+            isTiming = true;
+            playPauseButton.text = "Pause";
+        }
+        else
+        {
+            AudioManager.Instance.PauseAudio();
+            isTiming = false;
+            playPauseButton.text = "Play";
+        }
     }
 
     private void RestartTimer()
@@ -64,6 +81,10 @@ public class TimeBarController : MonoBehaviour
         UpdateCurrentTime(currentTime);
         UpdateTimeProgressBar(currentTime, totalTimeLength);
         playPauseButton.text = "Play";
+
+        // Reset audio time and stop
+        AudioManager.Instance.StopAudio();
+        AudioManager.Instance.SetAudioTime(0f);
     }
 
     private void SetTotalTime(float lengthInSeconds)
@@ -81,10 +102,10 @@ public class TimeBarController : MonoBehaviour
         timeProgressBar.value = (current / total) * 100f;
     }
 
-
     public void SetTimeMultiplier(float multiplier)
     {
         timeMultiplier = multiplier;
+        Debug.Log($"Timeline speed set to {multiplier}x");
     }
 
     private string FormatTime(float timeInSeconds)

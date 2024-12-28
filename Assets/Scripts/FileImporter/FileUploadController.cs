@@ -19,6 +19,9 @@ public class FileUploadController : MonoBehaviour
     private Label droneModelLabel;
     private UIManager uimanager;
 
+    private Button uploadMusicFileButton;
+    private Label musicFileLabel;
+
     void OnEnable()
     {
         uimanager = UIManager.Instance;
@@ -38,6 +41,10 @@ public class FileUploadController : MonoBehaviour
         uploadDroneModelButton = root.Q<Button>("drone-model-upload");
         droneModelLabel = root.Q<Label>("drone-model-label");
         uploadDroneModelButton.clicked += () => OnUploadFile("Drone Model", new[] { new ExtensionFilter("Drone Model Files", "sdl") }, ProcessDroneModel);
+
+        uploadMusicFileButton = root.Q<Button>("upload-music-button");
+        musicFileLabel = root.Q<Label>("upload-music-label");
+        uploadMusicFileButton.clicked += () => OnUploadFile("Music File", new[] { new ExtensionFilter("Audio Files", "mp3", "wav", "ogg") }, ProcessMusicFile);
     }
 
     private void OnUploadFile(string title, ExtensionFilter[] extensions, System.Action<string> processFileCallback)
@@ -86,5 +93,12 @@ public class FileUploadController : MonoBehaviour
         droneModelLabel.text = $"Loaded Model: {Path.GetFileName(path)}";
         Debug.Log($"Drone Model Loaded: {path}");
         // spracovat obsah
+    }
+
+    private void ProcessMusicFile(string path)
+    {
+        uimanager.ProcessMusicFile(path);
+        Debug.Log($"Music File Loaded: {path}");
+        //musicFileLabel.text = $"Loaded Music File: {Path.GetFileName(path)}";
     }
 }

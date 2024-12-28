@@ -4,6 +4,7 @@ using Drony.Entities;
 using UnityEngine;
 using Interpreter;
 using Utility;
+using Drony.dto;
 
 /// <summary>
 /// Singleton class <c>TrajectoryManager</c> manages logic for parser and generator 
@@ -41,7 +42,7 @@ public class TrajectoryManager
 
 
         while (true) {
-            (TimeSpan timestamp, string droneId, Command cmd, List<object> cmdArguments) = _flightProgramParser.NextCommand();
+            (TimeSpan timestamp, string droneId, Command cmd, CmdArgumentsDTO cmdArguments) = _flightProgramParser.NextCommand();
 
             if (droneId == "") {
                 break;
@@ -78,7 +79,8 @@ public class TrajectoryManager
                         cmdArguments);
                     break;
                 
-            }     
+            }  
+            //drones[droneId].setLastAsKeyState();
         }
     }
     private DroneState GetNextDroneState(int playbackSpeed, string droneId) {

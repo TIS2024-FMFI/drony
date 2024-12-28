@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Drony.dto;
 using Drony.Entities;
 using UnityEngine;
 using Utility;
@@ -8,30 +9,34 @@ using Utility;
 namespace Interpreter
 {
     public class TrajectoryGenerator {
-        private int MAX_FLIGHT_TIME = 3600000; // 1 hour
+        private int MAX_FLIGHT_TIME = 3600000; // 1 hour in ms
         private int TAKEOFF_SPEED = 1; // FIXME: add an option to set it in config file or in ui
 
-        private List<DroneState> GenerateEmptyStates(int duration) 
+        private List<DroneState> GenerateEmptyStates(int duration)
         {
-            List<DroneState> trajectory = new List<DroneState>();
-            for (int i = 0; i <= duration; i++) {
-                DroneState currentState = new DroneState(i);
-                trajectory.Add(currentState);
+            List<DroneState> emptyStates = new List<DroneState>();
+            for (int timeMoment = 0; timeMoment <= duration; timeMoment++) {
+                DroneState currentState = new DroneState();
+                currentState.Time = timeMoment;
+                emptyStates.Add(currentState);
             }
-            return trajectory;
+            return emptyStates;
         }
 
         public DroneTrajectory initDroneTrajectory(string droneId) 
         {
-            return new DroneTrajectory(droneId, GenerateEmptyStates(MAX_FLIGHT_TIME));
+            DroneTrajectory droneTrajectory = new DroneTrajectory();
+            droneTrajectory.DroneId = droneId;
+            droneTrajectory.Trajectory = GenerateEmptyStates(MAX_FLIGHT_TIME);
+            return droneTrajectory;
         }
 
         public DroneTrajectory SetInitialDronePosition(
                         DroneTrajectory droneTrajectory,
                         int timestamp,
-                        List<object> cmdArguments)
+                        CmdArgumentsDTO cmdArguments)
         {
-            Vector3 startPosition = (Vector3)cmdArguments[0];
+            Vector3 startPosition = cmdArguments.StartPosition;
             int timeFrom = 0;
             int timeTo = timestamp;
             for (int i = timeFrom; i < timeTo + 1; i++) {
@@ -44,15 +49,19 @@ namespace Interpreter
         public DroneTrajectory GenerateTakeOffTrajectory(
                         DroneTrajectory droneTrajectory,
                         int timestamp,
-                        List<object> cmdArguments)
+                        CmdArgumentsDTO cmdArguments)
         {
-            int height = (int)cmdArguments[0];
+            int height = cmdArguments.DestinationHeight;
 
             DroneState lastState = droneTrajectory.getLastAdded();
             Vector3 lastPosition = lastState.Position;
             Vector3 destinationPosition = new Vector3(lastPosition.x, lastPosition.y + height, lastPosition.z);
             int defaultYaw = 0;  // FIXME: add possibility to set yaw in setPos command
-            List<object> cmdArgumentsForLinear = new List<object> {destinationPosition, defaultYaw, TAKEOFF_SPEED};
+            CmdArgumentsDTO cmdArgumentsForLinear = new CmdArgumentsDTO(); 
+            cmdArgumentsForLinear.DestinationPosition = destinationPosition;
+            cmdArgumentsForLinear.DestinationYaw = defaultYaw;
+            cmdArgumentsForLinear.Speed = TAKEOFF_SPEED;
+        
             return GenerateLinearTrajectory(droneTrajectory, timestamp, cmdArgumentsForLinear);
         }
         
@@ -66,8 +75,11 @@ namespace Interpreter
                 return droneTrajectory;
             }
             for (int i = timeFrom; i < timeTo + 1; i++) { // FIXME: timefrom + 1
-                droneTrajectory[i] = new DroneState(exampleState.Position, exampleState.YawAngle, i);
-                droneTrajectory.LastStateIndex = i;
+                DroneState droneState = new DroneState();
+                droneState.Position = exampleState.Position;
+                droneState.YawAngle = exampleState.YawAngle;
+                droneState.Time = i;
+                droneTrajectory[i] = droneState;
             }
             return droneTrajectory;
         }
@@ -75,11 +87,11 @@ namespace Interpreter
         public DroneTrajectory GenerateLinearTrajectory(
                         DroneTrajectory droneTrajectory, 
                         int timestamp, 
-                        List<object> cmdArguments) 
+                        CmdArgumentsDTO cmdArguments) 
         {
-            Vector3 destinationPosition = (Vector3)cmdArguments[0];
-            int destinationYaw = (int)cmdArguments[1];
-            int speed = (int)cmdArguments[2];
+            Vector3 destinationPosition = cmdArguments.DestinationPosition;
+            int destinationYaw = cmdArguments.DestinationYaw;
+            int speed = cmdArguments.Speed;
 
             DroneState lastState = droneTrajectory.getLastAdded();
             int timeFrom = lastState.Time;
@@ -118,7 +130,7 @@ namespace Interpreter
         public DroneTrajectory GenerateCircularTrajectory(
                         DroneTrajectory droneTrajectory, 
                         int timestamp, 
-                        List<object> cmdArguments)
+                        CmdArgumentsDTO cmdArguments)
         {
             throw new NotImplementedException("GenerateCircularTrajectory is not implemented yet.");
         }
@@ -126,15 +138,15 @@ namespace Interpreter
         public DroneTrajectory GenerateSpiralTrajectory(
                         DroneTrajectory droneTrajectory, 
                         int timestamp, 
-                        List<object> cmdArguments)
+                        CmdArgumentsDTO cmdArguments)
         {
             // Parse parameters
-            Vector3 destinationPosition = (Vector3)cmdArguments[0];
-            Vector3 pointA = (Vector3)cmdArguments[1];
-            Vector3 pointB = (Vector3)cmdArguments[2];
-            bool isClockwise = (bool)cmdArguments[3];
-            int numberOfRevolutions = (int)cmdArguments[4];
-            int speed = (int)cmdArguments[5];
+            Vector3 destinationPosition = cmdArguments.DestinationPosition;
+            Vector3 pointA = cmdArguments.PointA;
+            Vector3 pointB = cmdArguments.PointB;
+            bool isClockwise = cmdArguments.IsClockwise;
+            int numberOfRevolutions = cmdArguments.NumberOfRevolutions;
+            int speed = cmdArguments.Speed;
 
             // Get the last state of the drone
             DroneState lastState = droneTrajectory.getLastAdded();
@@ -191,7 +203,7 @@ namespace Interpreter
         public DroneTrajectory GenerateSinusTrajectory(
                         DroneTrajectory droneTrajectory, 
                         int timestamp, 
-                        List<object> cmdArguments)
+                        CmdArgumentsDTO cmdArguments)
         {
             throw new NotImplementedException("GenerateSinusTrajectory is not implemented yet.");
         }
@@ -199,7 +211,7 @@ namespace Interpreter
         public DroneTrajectory GenerateParabolaTrajectory(
                         DroneTrajectory droneTrajectory, 
                         int timestamp, 
-                        List<object> cmdArguments)
+                        CmdArgumentsDTO cmdArguments)
         {
             throw new NotImplementedException("GenerateParabolaTrajectory is not implemented yet.");
         }
@@ -207,7 +219,7 @@ namespace Interpreter
         public DroneTrajectory GeneratePointsTrajectory(
                         DroneTrajectory droneTrajectory, 
                         int timestamp, 
-                        List<object> cmdArguments)
+                        CmdArgumentsDTO cmdArguments)
         {
             throw new NotImplementedException("GeneratePointsTrajectory is not implemented yet.");
         }

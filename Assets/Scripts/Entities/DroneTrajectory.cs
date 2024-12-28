@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using Interpreter;
 
 namespace Drony.Entities
 {
@@ -11,25 +10,7 @@ namespace Drony.Entities
         public List<DroneState> Trajectory { get; set; }
         public int LastStateIndex { get; set; }
 
-        public DroneTrajectory(string droneID) 
-        {
-            DroneId = droneID;
-            Trajectory = new List<DroneState>();
-            LastStateIndex = 0;
-        }
-
-        public DroneTrajectory(string droneID, DroneState initialState)
-        {
-            DroneId = droneID;
-            Trajectory = new List<DroneState>() { initialState };
-            LastStateIndex = 0;
-        }
-
-        public DroneTrajectory(string droneID, List<DroneState> emptyTrajectory) 
-        {
-            DroneId = droneID;
-            Trajectory = emptyTrajectory;
-            LastStateIndex = 0;  // the trajectory is empty, so there is no need to append LastStateIndex
+        public DroneTrajectory() {
         }
 
         public DroneTrajectory(DroneTrajectory other)
@@ -44,8 +25,10 @@ namespace Drony.Entities
 
         public void addTrajectory(List<Vector3> newTrajectory) 
         {
-            for (int i = 0; i < newTrajectory.Count; i++) {
-                Trajectory.Add(new DroneState(newTrajectory[i]));
+            for (int timeMoment = 0; timeMoment < newTrajectory.Count; timeMoment++) {
+                DroneState newDroneState = new DroneState();
+                newDroneState.Position = newTrajectory[timeMoment];
+                Trajectory.Add(newDroneState);
             }
         }
 
@@ -91,6 +74,11 @@ namespace Drony.Entities
             DroneState next = Trajectory[currentStateIndex];
             
             return next;
+        }
+
+        public void setLastAsKeyState() {
+            Trajectory[Trajectory.Count - 1].IsKeyState = true;
+            Debug.Log(Trajectory[Trajectory.Count - 1].IsKeyState);
         }
     }
 }

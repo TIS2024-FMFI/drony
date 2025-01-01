@@ -16,6 +16,7 @@ public class TrajectoryManager
     private int currentStateIndex;
     private TrajectoryGenerator trajectoryGenerator;
     private FlightProgramParser _flightProgramParser;
+    private int TAKEOFF_SPEED = 1; // FIXME: add an option to set it in config file or in ui
     private static TrajectoryManager _instance;
     public static TrajectoryManager Instance
     {
@@ -55,20 +56,20 @@ public class TrajectoryManager
             switch (cmd)
             {
                 case Command.SetPos:
-                    drones[droneId] = trajectoryGenerator.SetInitialDronePosition(
-                        droneTrajectory,
+                    SetPosCommand(
+                        droneId,
                         timestampMilliseconds,
                         cmdArguments);
                     break;
                 case Command.TakeOff:
-                    drones[droneId] = trajectoryGenerator.GenerateTakeOffTrajectory(
-                        droneTrajectory,
+                    TakeOffCommand(
+                        droneId,
                         timestampMilliseconds,
                         cmdArguments);
                     break;
                 case Command.FlyTo:
-                    drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(
-                        droneTrajectory, 
+                    FlyToCommand(
+                        droneId,
                         timestampMilliseconds,
                         cmdArguments);
                     break;
@@ -83,6 +84,82 @@ public class TrajectoryManager
             drones[droneId].setLastAsKeyState();
         }
     }
+    private void SetPosCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--SetPosCommand");
+        drones[droneId] = trajectoryGenerator.SetInitialDronePosition(
+                        drones[droneId],
+                        timestamp,
+                        cmdArguments);
+    }
+    private void TakeOffCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--TakeOffCommand");
+        int height = cmdArguments.DestinationHeight;
+
+        DroneState lastState = drones[droneId].getLastAdded();
+        Vector3 lastPosition = lastState.Position;
+        int timeLastStateEndPlusOne = lastState.Time + 1;
+        int timeLinearTrajectoryStart = timestamp;
+
+        Vector3 destinationPosition = new Vector3(lastPosition.x, lastPosition.y + height, lastPosition.z);
+        int defaultYaw = (int)lastState.YawAngle.eulerAngles.y; // FIXME: velmi blbe riesenie, treba prerobit
+
+        CmdArgumentsDTO cmdArgumentsForLinear = new CmdArgumentsDTO(); 
+        cmdArgumentsForLinear.DestinationPosition = destinationPosition;
+        cmdArgumentsForLinear.DestinationYaw = defaultYaw;
+        cmdArgumentsForLinear.Speed = TAKEOFF_SPEED;
+        
+        if (timeLastStateEndPlusOne < timeLinearTrajectoryStart) 
+        {
+            drones[droneId] = trajectoryGenerator.GenerateHoverTrajectory(
+                                new DroneTrajectory(drones[droneId]), 
+                                timeLastStateEndPlusOne, 
+                                timeLinearTrajectoryStart, 
+                                lastState
+                            );
+        }
+
+        drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(drones[droneId], timestamp, cmdArgumentsForLinear);
+    }
+    private void FlyToCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--FlyToCommand");
+        DroneState lastState = drones[droneId].getLastAdded();
+        int timeLastStateEndPlusOne = lastState.Time + 1;
+        int timeLinearTrajectoryStart = timestamp;
+
+        if (timeLastStateEndPlusOne > timeLinearTrajectoryStart) 
+        {
+            // Generate bezier trajectory
+            Vector3 pointA = drones[droneId][timeLinearTrajectoryStart].Position;
+            Vector3 pointB = lastState.Position;
+            Vector3 pointC = cmdArguments.DestinationPosition;
+
+            CmdArgumentsDTO cmdArgumentsForBezier = new CmdArgumentsDTO(); 
+            cmdArgumentsForBezier.PointA = pointA;
+            cmdArgumentsForBezier.PointB = pointB;
+            cmdArgumentsForBezier.PointC = pointC;
+            cmdArgumentsForBezier.Speed = cmdArguments.Speed;
+            
+            drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(drones[droneId], timestamp, cmdArgumentsForBezier);
+            return;
+
+        } 
+        else if (timeLastStateEndPlusOne < timeLinearTrajectoryStart) 
+        {
+            drones[droneId] = trajectoryGenerator.GenerateHoverTrajectory(
+                                new DroneTrajectory(drones[droneId]), 
+                                timeLastStateEndPlusOne, 
+                                timeLinearTrajectoryStart, 
+                                lastState
+                            );
+        }
+        drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(drones[droneId], timestamp, cmdArguments);
+
+    }
+
+
     private DroneState GetNextDroneState(int playbackSpeed, string droneId) {
             int gapInMillis = Utilities.ConvertFromPlaybackSpeedToMillisGap(playbackSpeed);
             DroneState currentDroneState = drones[droneId].getNext(playbackSpeed, currentStateIndex);

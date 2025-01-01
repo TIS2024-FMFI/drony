@@ -13,6 +13,7 @@ namespace Drony.dto
         public int Speed { get; set; }
         public Vector3 PointA { get; set; }
         public Vector3 PointB { get; set; }
+        public Vector3 PointC { get; set; }
         public bool IsClockwise { get; set; }
         public int NumberOfRevolutions { get; set; }
         public string Name { get; set; }

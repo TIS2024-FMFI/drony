@@ -10,7 +10,7 @@ namespace Interpreter
 {
     public class TrajectoryGenerator {
         private int MAX_FLIGHT_TIME = 3600000; // 1 hour in ms
-        private int TAKEOFF_SPEED = 1; // FIXME: add an option to set it in config file or in ui
+        
         private int TAKEOFF_YAW = 0; // FIXME: add an option to set it in config file or in ui
 
         private List<DroneState> GenerateEmptyStates(int duration)
@@ -51,26 +51,6 @@ namespace Interpreter
             Debug.Log($"SetInitialDronePosition, time end: {timeTo}");
             return droneTrajectory;
         }
-
-        public DroneTrajectory GenerateTakeOffTrajectory(
-                        DroneTrajectory droneTrajectory,
-                        int timestamp,
-                        CmdArgumentsDTO cmdArguments)
-        {
-            int height = cmdArguments.DestinationHeight;
-
-            DroneState lastState = droneTrajectory.getLastAdded();
-            Vector3 lastPosition = lastState.Position;
-            Vector3 destinationPosition = new Vector3(lastPosition.x, lastPosition.y + height, lastPosition.z);
-            int defaultYaw = (int)lastState.YawAngle.eulerAngles.y; // FIXME: velmi blbe riesenie, treba prerobit
-
-            CmdArgumentsDTO cmdArgumentsForLinear = new CmdArgumentsDTO(); 
-            cmdArgumentsForLinear.DestinationPosition = destinationPosition;
-            cmdArgumentsForLinear.DestinationYaw = defaultYaw;
-            cmdArgumentsForLinear.Speed = TAKEOFF_SPEED;
-
-            return GenerateLinearTrajectory(droneTrajectory, timestamp, cmdArgumentsForLinear);
-        }
         
         public DroneTrajectory GenerateHoverTrajectory(
                         DroneTrajectory droneTrajectory,
@@ -78,10 +58,8 @@ namespace Interpreter
                         int timeTo,
                         DroneState exampleState)
         {
-            if (timeFrom > timeTo) {
-                return droneTrajectory;
-            }
             Debug.Log($"GenerateHoverTrajectory, time start: {timeFrom}");
+
             for (int timeMoment = timeFrom; timeMoment < timeTo; timeMoment++) {
                 DroneState droneState = new DroneState(exampleState);
                 droneState.Time = timeMoment;
@@ -100,43 +78,17 @@ namespace Interpreter
                         CmdArgumentsDTO cmdArguments) 
         {
             Debug.Log($"GenerateLinearTrajectory, time start: {timestamp}");
+
             Vector3 destinationPosition = cmdArguments.DestinationPosition;
             int destinationYaw = cmdArguments.DestinationYaw;
             int speed = cmdArguments.Speed;
 
             DroneState lastState = droneTrajectory.getLastAdded();
-            int timeLastStateEndPlusOne = lastState.Time + 1;
-            int timeLinearTrajectoryStart = timestamp;
-
-            DroneTrajectory updatedDroneTrajectory;
-
-            if (timeLastStateEndPlusOne > timeLinearTrajectoryStart) {
-                // The last trajectory finished after the time, the next trajectory is starting.
-                // The next trajectory will start from the state at a time timeLinearTrajectoryStart
-                // The next trajectory will be bezier trajectory with 3 points 
-                // TODO: do this shit, not implemented yet
-                updatedDroneTrajectory = droneTrajectory;
-
-                
-            } else if (timeLastStateEndPlusOne < timeLinearTrajectoryStart) {
-                // There is a gap between two trajectories
-                // The drone will be hovering between execution of these two trajectories
-                updatedDroneTrajectory = GenerateHoverTrajectory(
-                                new DroneTrajectory(droneTrajectory), 
-                                timeLastStateEndPlusOne, 
-                                timeLinearTrajectoryStart, 
-                                lastState
-                            );
-            } else {
-                // The next trajectory starting right after the last one
-                updatedDroneTrajectory = droneTrajectory;
-            }
             
-            
-
             Vector3 startPosition = lastState.Position;
             Quaternion startRotation = lastState.YawAngle;
 
+            // maybe change to float?
             int distanceMeters = (int)Vector3.Distance(startPosition, destinationPosition);
             int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
 
@@ -151,13 +103,13 @@ namespace Interpreter
                 float t = localTimeMoment / (float) totalTime;
                 Vector3 point = Vector3.Lerp(startPosition, destinationPosition, t);
                 Quaternion yaw = Quaternion.Slerp(startRotation, targetRotation, t);
-                updatedDroneTrajectory[timeMoment].Position = point;
-                updatedDroneTrajectory[timeMoment].YawAngle = yaw;
-                updatedDroneTrajectory.LastStateIndex = timeMoment;
+                droneTrajectory[timeMoment].Position = point;
+                droneTrajectory[timeMoment].YawAngle = yaw;
+                droneTrajectory.LastStateIndex = timeMoment;
             }
             
             Debug.Log($"GenerateLinearTrajectory, time end: {droneTrajectory.LastStateIndex}");
-            return updatedDroneTrajectory;
+            return droneTrajectory;
         }
 
         public DroneTrajectory GenerateCircularTrajectory(
@@ -166,6 +118,77 @@ namespace Interpreter
                         CmdArgumentsDTO cmdArguments)
         {
             throw new NotImplementedException("GenerateCircularTrajectory is not implemented yet.");
+        }
+
+        public DroneTrajectory GenerateQuadraticBezierTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        CmdArgumentsDTO cmdArguments)
+        {
+            // TODO: !!! Doesn't solve rotation for now. The previous rotation should be brought from the highter level
+            // There should be a layer that is going to do all checkings and call this function to calculate pure trajectory
+            
+            Debug.Log($"GenerateQuadraticBezierTrajectory, time start: {timestamp}");
+            Vector3 pointA = cmdArguments.PointA;
+            Vector3 pointB = cmdArguments.PointB;
+            Vector3 pointC = cmdArguments.PointC;
+            //int destinationYaw = cmdArguments.DestinationYaw;
+            int speed = cmdArguments.Speed;
+            float distanceMeters = CalculateBezierCurveLength(pointA, pointB, pointC);
+            int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
+
+            int totalTime = distanceMillimeters / speed;
+            //Quaternion targetRotation = Quaternion.Euler(0, destinationYaw, 0);
+
+            int duration = timestamp + totalTime;
+            for (int timeMoment = timestamp; timeMoment < duration; timeMoment++)
+            {
+                int localTimeMoment = timeMoment - timestamp;
+                float t = localTimeMoment / (float) totalTime;
+                Vector3 point = GetQuadraticBezierPositionByTime(t, pointA, pointB, pointC);
+                droneTrajectory[timeMoment].Position = point;
+                droneTrajectory.LastStateIndex = timeMoment;
+            }
+            Debug.Log($"GenerateQuadraticBezierTrajectory, time end: {droneTrajectory.LastStateIndex}");
+            return droneTrajectory;
+
+        }
+        private Vector3 GetQuadraticBezierPositionByTime(float Time, Vector3 pointA, Vector3 pointB, Vector3 pointC) 
+        {
+            Time = Mathf.Clamp01(Time);
+            float invTime = 1 - Time;
+            return (invTime * invTime * pointA)
+                + (2 * invTime * Time * pointB)
+                + (Time * Time * pointC);
+        }
+
+         private float CalculateBezierCurveLength(Vector3 A, Vector3 B, Vector3 C, int subdivisions = 100)
+        {
+            float totalLength = 0f;
+
+            // Previous point on the curve
+            Vector3 previousPoint = A;
+
+            // Step size
+            float step = 1f / subdivisions;
+
+            for (int i = 1; i <= subdivisions; i++)
+            {
+                float t = i * step;
+
+                // Calculate the current point on the curve
+                Vector3 currentPoint = Mathf.Pow(1 - t, 2) * A +
+                                    2 * (1 - t) * t * B +
+                                    Mathf.Pow(t, 2) * C;
+
+                // Add the distance between the previous point and the current point
+                totalLength += Vector3.Distance(previousPoint, currentPoint);
+
+                // Update the previous point
+                previousPoint = currentPoint;
+            }
+
+            return totalLength;
         }
 
         public DroneTrajectory GenerateSpiralTrajectory(

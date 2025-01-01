@@ -17,9 +17,9 @@ namespace Utility
         {
             return playbackSpeed * (MILLIS_IN_SEC / FRAME_RATE);
         }
-        public static int ConvertFromMetersToMillimeters(int meter) 
+        public static int ConvertFromMetersToMillimeters(float meter) 
         {
-            return meter * MILLIMETERS_IN_ONE_METER;
+            return (int) meter * MILLIMETERS_IN_ONE_METER;
         }
         public static string ReadTextFile(string path)
         {

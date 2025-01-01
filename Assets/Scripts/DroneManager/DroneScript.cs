@@ -15,9 +15,11 @@ public class DroneScript : MonoBehaviour
 {
     private TrajectoryManager trajectoryManager;
     private string id;
-    private int currentPositionIndex = 0;
+    private int currentTime;
     private float startTime;
     private List<GizmosState> markerPositions = new List<GizmosState>();
+    private Color color;
+    private GUIStyle style;
 
     public float speed;
 
@@ -31,7 +33,16 @@ public class DroneScript : MonoBehaviour
 
     void Start()
     {
+        currentTime = 0;
         startTime = Time.time;
+        int idHash = id.GetHashCode();
+        color = Utilities.GetContrastColor(idHash);
+        style = new GUIStyle();
+
+        #if UNITY_EDITOR
+        style.fontSize = 52;
+        style.normal.textColor = color;
+        #endif
     }
 
     // Update is called once per frame
@@ -40,42 +51,35 @@ public class DroneScript : MonoBehaviour
         DroneState currentState = trajectoryManager.GetStateAtTime(1, id);
         transform.position = currentState.Position;
         transform.rotation = currentState.YawAngle;
-        currentPositionIndex++;
-        AddMarker(transform.position);
-
+        currentTime = currentState.Time;
+        AddMarker(transform.position, currentState.IsKeyState);
         // for debugging:
-        // if (currentState.Time % 10000 == 0) {
+        // if (currentState.IsKeyState) {
         //     float elapsedTime = Time.time - startTime;
-        //     Debug.Log($"Elapsed time: {elapsedTime} seconds");
+        //     Debug.Log($"Estimated: {currentState.Time}. Elapsed: {elapsedTime}");
         // }
     }
 
-    private void AddMarker(Vector3 position)
+    private void AddMarker(Vector3 position, bool isKeyState)
     {
-        int idHash = id.GetHashCode();
-        Color color = Utilities.GetContrastColor(idHash);
-
-        GUIStyle style = new GUIStyle();
-        #if UNITY_EDITOR
-        style.fontSize = 52;
-        style.normal.textColor = color;
-        #endif
-        string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
-
-        markerPositions.Add(new GizmosState(position, color, text, style));
+        markerPositions.Add(new GizmosState(position, color, "", style));
     }
 
     private void OnDrawGizmos()
     {
-        int i = 0;
+        foreach (DroneState droneState in trajectoryManager.GetKeyStates(id)) 
+        {
+            if (currentTime < droneState.Time) {
+                break;
+            }
+            Vector3 position = droneState.Position;
+            string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
+            Handles.Label(position, text, style);
+        }
         foreach (GizmosState marker in markerPositions)
         {
-            if (i % 100 == 0) {
-                Handles.Label(marker.Position, marker.Text, marker.Style);
-            }
             Gizmos.color = marker.Color;
             Gizmos.DrawSphere(marker.Position, 0.05f); // Draw small red spheres
-            i++;
         }
     }
 }

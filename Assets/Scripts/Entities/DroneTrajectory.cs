@@ -8,9 +8,11 @@ namespace Drony.Entities
     {
         public string DroneId { get; set; }
         public List<DroneState> Trajectory { get; set; }
-        public int LastStateIndex { get; set; }
+        public List<DroneState> KeyStates {get; set; }
+        public int LastStateIndex { get; set; } // index of the last state that was updated
 
         public DroneTrajectory() {
+            KeyStates = new List<DroneState>();
         }
 
         public DroneTrajectory(DroneTrajectory other)
@@ -21,6 +23,11 @@ namespace Drony.Entities
             for (int i = 0; i < other.Count; i++) {
                 Trajectory.Add(other.Trajectory[i]);
             }
+            KeyStates = new List<DroneState>();
+            foreach (DroneState droneState in other.KeyStates) {
+                KeyStates.Add(droneState);
+            }
+            
         }
 
         public void addTrajectory(List<Vector3> newTrajectory) 
@@ -77,8 +84,9 @@ namespace Drony.Entities
         }
 
         public void setLastAsKeyState() {
-            Trajectory[Trajectory.Count - 1].IsKeyState = true;
-            Debug.Log(Trajectory[Trajectory.Count - 1].IsKeyState);
+            Trajectory[LastStateIndex].IsKeyState = true;
+            KeyStates.Add(Trajectory[LastStateIndex]);
+            Debug.Log($"Set key state: {Trajectory[LastStateIndex].Time}");
         }
     }
 }

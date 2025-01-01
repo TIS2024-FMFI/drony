@@ -80,7 +80,7 @@ public class TrajectoryManager
                     break;
                 
             }  
-            //drones[droneId].setLastAsKeyState();
+            drones[droneId].setLastAsKeyState();
         }
     }
     private DroneState GetNextDroneState(int playbackSpeed, string droneId) {
@@ -103,6 +103,9 @@ public class TrajectoryManager
             currentStateIndex = 0;
             return GetNextDroneState(playbackSpeed, droneId);
         }
-        
+    }
+    public List<DroneState> GetKeyStates(string droneId)
+    {
+        return drones[droneId].KeyStates;
     }
 }

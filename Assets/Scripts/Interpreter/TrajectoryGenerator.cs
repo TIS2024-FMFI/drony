@@ -11,15 +11,18 @@ namespace Interpreter
     public class TrajectoryGenerator {
         private int MAX_FLIGHT_TIME = 3600000; // 1 hour in ms
         private int TAKEOFF_SPEED = 1; // FIXME: add an option to set it in config file or in ui
+        private int TAKEOFF_YAW = 0; // FIXME: add an option to set it in config file or in ui
 
         private List<DroneState> GenerateEmptyStates(int duration)
         {
+            Debug.Log($"GenerateEmptyStates, time start: {0}");
             List<DroneState> emptyStates = new List<DroneState>();
-            for (int timeMoment = 0; timeMoment <= duration; timeMoment++) {
+            for (int timeMoment = 0; timeMoment < duration; timeMoment++) {
                 DroneState currentState = new DroneState();
                 currentState.Time = timeMoment;
                 emptyStates.Add(currentState);
             }
+            Debug.Log($"GenerateEmptyStates, time end: {duration - 1}");
             return emptyStates;
         }
 
@@ -38,11 +41,14 @@ namespace Interpreter
         {
             Vector3 startPosition = cmdArguments.StartPosition;
             int timeFrom = 0;
-            int timeTo = timestamp;
-            for (int i = timeFrom; i < timeTo + 1; i++) {
-                droneTrajectory[i].Position = startPosition;
-                droneTrajectory.LastStateIndex = i;
+            int timeTo = timestamp; // timestamp included
+            for (int timeMoment = timeFrom; timeMoment <= timeTo; timeMoment++) {
+                droneTrajectory[timeMoment].Position = startPosition;
+                droneTrajectory[timeMoment].YawAngle = Quaternion.Euler(0, TAKEOFF_YAW, 0);
             }
+            droneTrajectory.LastStateIndex = timeTo;
+
+            Debug.Log($"SetInitialDronePosition, time end: {timeTo}");
             return droneTrajectory;
         }
 
@@ -56,31 +62,35 @@ namespace Interpreter
             DroneState lastState = droneTrajectory.getLastAdded();
             Vector3 lastPosition = lastState.Position;
             Vector3 destinationPosition = new Vector3(lastPosition.x, lastPosition.y + height, lastPosition.z);
-            int defaultYaw = 0;  // FIXME: add possibility to set yaw in setPos command
+            int defaultYaw = (int)lastState.YawAngle.eulerAngles.y; // FIXME: velmi blbe riesenie, treba prerobit
+
             CmdArgumentsDTO cmdArgumentsForLinear = new CmdArgumentsDTO(); 
             cmdArgumentsForLinear.DestinationPosition = destinationPosition;
             cmdArgumentsForLinear.DestinationYaw = defaultYaw;
             cmdArgumentsForLinear.Speed = TAKEOFF_SPEED;
-        
+
             return GenerateLinearTrajectory(droneTrajectory, timestamp, cmdArgumentsForLinear);
         }
         
         public DroneTrajectory GenerateHoverTrajectory(
-                        DroneTrajectory droneTrajectory, 
-                        int timeFrom, 
-                        int timeTo, 
-                        DroneState exampleState) 
+                        DroneTrajectory droneTrajectory,
+                        int timeFrom,
+                        int timeTo,
+                        DroneState exampleState)
         {
             if (timeFrom > timeTo) {
                 return droneTrajectory;
             }
-            for (int i = timeFrom; i < timeTo + 1; i++) { // FIXME: timefrom + 1
-                DroneState droneState = new DroneState();
-                droneState.Position = exampleState.Position;
-                droneState.YawAngle = exampleState.YawAngle;
-                droneState.Time = i;
-                droneTrajectory[i] = droneState;
+            Debug.Log($"GenerateHoverTrajectory, time start: {timeFrom}");
+            for (int timeMoment = timeFrom; timeMoment < timeTo; timeMoment++) {
+                DroneState droneState = new DroneState(exampleState);
+                droneState.Time = timeMoment;
+                droneState.IsKeyState = false;
+                droneTrajectory[timeMoment] = droneState;
+                droneTrajectory.LastStateIndex = timeMoment;
             }
+
+            Debug.Log($"GenerateHoverTrajectory, time end: {droneTrajectory.LastStateIndex}");
             return droneTrajectory;
         }
 
@@ -89,19 +99,40 @@ namespace Interpreter
                         int timestamp, 
                         CmdArgumentsDTO cmdArguments) 
         {
+            Debug.Log($"GenerateLinearTrajectory, time start: {timestamp}");
             Vector3 destinationPosition = cmdArguments.DestinationPosition;
             int destinationYaw = cmdArguments.DestinationYaw;
             int speed = cmdArguments.Speed;
 
             DroneState lastState = droneTrajectory.getLastAdded();
-            int timeFrom = lastState.Time;
-            int timeTo = timestamp;
+            int timeLastStateEndPlusOne = lastState.Time + 1;
+            int timeLinearTrajectoryStart = timestamp;
+
+            DroneTrajectory updatedDroneTrajectory;
+
+            if (timeLastStateEndPlusOne > timeLinearTrajectoryStart) {
+                // The last trajectory finished after the time, the next trajectory is starting.
+                // The next trajectory will start from the state at a time timeLinearTrajectoryStart
+                // The next trajectory will be bezier trajectory with 3 points 
+                // TODO: do this shit, not implemented yet
+                updatedDroneTrajectory = droneTrajectory;
+
+                
+            } else if (timeLastStateEndPlusOne < timeLinearTrajectoryStart) {
+                // There is a gap between two trajectories
+                // The drone will be hovering between execution of these two trajectories
+                updatedDroneTrajectory = GenerateHoverTrajectory(
+                                new DroneTrajectory(droneTrajectory), 
+                                timeLastStateEndPlusOne, 
+                                timeLinearTrajectoryStart, 
+                                lastState
+                            );
+            } else {
+                // The next trajectory starting right after the last one
+                updatedDroneTrajectory = droneTrajectory;
+            }
             
-            DroneTrajectory updatedDroneTrajectory = GenerateHoverTrajectory(
-                new DroneTrajectory(droneTrajectory), 
-                timeFrom, 
-                timeTo, 
-                lastState);
+            
 
             Vector3 startPosition = lastState.Position;
             Quaternion startRotation = lastState.YawAngle;
@@ -109,21 +140,23 @@ namespace Interpreter
             int distanceMeters = (int)Vector3.Distance(startPosition, destinationPosition);
             int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
 
-            float totalTime = distanceMillimeters / speed;
-            //int totalFrames = Mathf.CeilToInt(totalTime * resolution);
+            int totalTime = distanceMillimeters / speed;
             Quaternion targetRotation = Quaternion.Euler(0, destinationYaw, 0);
 
             // interpolation between start and destination vectors
-            for (int currentTime = timestamp; currentTime <= timestamp + totalTime; currentTime++)
+            int duration = timestamp + totalTime;
+            for (int timeMoment = timestamp; timeMoment < duration; timeMoment++)
             {
-                float localTime = currentTime - timestamp;
-                float t = localTime / (float)totalTime;
+                int localTimeMoment = timeMoment - timestamp;
+                float t = localTimeMoment / (float) totalTime;
                 Vector3 point = Vector3.Lerp(startPosition, destinationPosition, t);
                 Quaternion yaw = Quaternion.Slerp(startRotation, targetRotation, t);
-                updatedDroneTrajectory[currentTime].Position = point;
-                updatedDroneTrajectory[currentTime].YawAngle = yaw;
-                updatedDroneTrajectory.LastStateIndex = currentTime;
+                updatedDroneTrajectory[timeMoment].Position = point;
+                updatedDroneTrajectory[timeMoment].YawAngle = yaw;
+                updatedDroneTrajectory.LastStateIndex = timeMoment;
             }
+            
+            Debug.Log($"GenerateLinearTrajectory, time end: {droneTrajectory.LastStateIndex}");
             return updatedDroneTrajectory;
         }
 

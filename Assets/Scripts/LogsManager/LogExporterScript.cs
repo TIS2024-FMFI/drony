@@ -25,8 +25,10 @@ public class LogExporter : MonoBehaviour
 
     private void HandleLog(string logString, string stackTrace, LogType type)
     {
-        // Format the log entry
-        string logEntry = $"[{type}] {logString}\n";
+        string timestamp = System.DateTime.Now.ToString("HH:mm:ss");
+
+        // Format the log entry with a timestamp
+        string logEntry = $"[{timestamp}] [{type}] {logString}\n";
 
         // Include stack trace for errors or exceptions
         if (type == LogType.Error || type == LogType.Exception)

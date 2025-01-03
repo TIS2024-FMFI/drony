@@ -121,26 +121,22 @@ public class TrajectoryManager
         int timeLastStateEndPlusOne = lastState.Time + 1;
         int timeLinearTrajectoryStart = timestamp;
 
-        if (timeLastStateEndPlusOne > timeLinearTrajectoryStart) 
+        if (NewTrajectoryStartsBeforePreviousEnds(timeLastStateEndPlusOne, timeLinearTrajectoryStart)) 
         {
-            // Generate bezier trajectory
             DroneState bezierTrajectoryStartState = drones[droneId][timeLinearTrajectoryStart];
-
-            Vector3 pointA = bezierTrajectoryStartState.Position;
-            Vector3 pointB = lastState.Position;
-            Vector3 pointC = cmdArguments.DestinationPosition;
-
-            CmdArgumentsDTO cmdArgumentsForBezier = new CmdArgumentsDTO(); 
-            cmdArgumentsForBezier.PointA = pointA;
-            cmdArgumentsForBezier.PointB = pointB;
-            cmdArgumentsForBezier.PointC = pointC;
-            cmdArgumentsForBezier.Speed = cmdArguments.Speed;
-            cmdArgumentsForBezier.StartYaw = bezierTrajectoryStartState.YawAngle;
-            cmdArgumentsForBezier.DestinationYaw = cmdArguments.DestinationYaw;
-            
-            drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(drones[droneId], timestamp, cmdArgumentsForBezier);
+            FlyQuadraticBezier(
+                A: bezierTrajectoryStartState.Position,
+                B: lastState.Position,
+                C: cmdArguments.DestinationPosition,
+                droneId: droneId,
+                timestamp: timestamp,
+                speed: cmdArguments.Speed,
+                startYaw: bezierTrajectoryStartState.YawAngle,
+                destinationYaw: cmdArguments.DestinationYaw
+            );
+            return;
         }
-        else if (timeLastStateEndPlusOne < timeLinearTrajectoryStart) 
+        if (ThereIsANeedToHoverAndWait(timeLastStateEndPlusOne, timeLinearTrajectoryStart)) 
         {
             drones[droneId] = trajectoryGenerator.GenerateHoverTrajectory(
                                 new DroneTrajectory(drones[droneId]), 
@@ -148,11 +144,44 @@ public class TrajectoryManager
                                 timeLinearTrajectoryStart, 
                                 lastState
                             );
-            cmdArguments.StartPosition = lastState.Position;
-            cmdArguments.StartYaw = lastState.YawAngle;  
-            drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(drones[droneId], timestamp, cmdArguments);
         }
+        
+        cmdArguments.StartPosition = lastState.Position;
+        cmdArguments.StartYaw = lastState.YawAngle;
+        drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(drones[droneId], timestamp, cmdArguments);
+    
     }
+
+    private bool NewTrajectoryStartsBeforePreviousEnds(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
+    {
+        return timeLastStateEndPlusOne > timeLinearTrajectoryStart;
+    }
+
+    private bool ThereIsANeedToHoverAndWait(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
+    {
+        return timeLastStateEndPlusOne < timeLinearTrajectoryStart;
+    }
+
+    private bool NewTrajectoryStartsRightAfterPreviousEnds(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
+    {
+        return timeLastStateEndPlusOne == timeLinearTrajectoryStart;
+    }
+    
+
+    private void FlyQuadraticBezier(string droneId, int timestamp, Vector3 A, Vector3 B, Vector3 C, int speed, Quaternion startYaw, Quaternion destinationYaw)
+    {
+        CmdArgumentsDTO cmdArgumentsForBezier = new CmdArgumentsDTO(); 
+        cmdArgumentsForBezier.PointA = A;
+        cmdArgumentsForBezier.PointB = B;
+        cmdArgumentsForBezier.PointC = C;
+        cmdArgumentsForBezier.Speed = speed;
+        cmdArgumentsForBezier.StartYaw = startYaw;
+        cmdArgumentsForBezier.DestinationYaw = destinationYaw;
+
+        drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(drones[droneId], timestamp, cmdArgumentsForBezier);
+    }
+
+
     private void FlyTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log("--FlyTrajectoryCommand");

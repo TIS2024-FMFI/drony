@@ -79,21 +79,17 @@ namespace Interpreter
         {
             Debug.Log($"GenerateLinearTrajectory, time start: {timestamp}");
 
+            Vector3 startPosition = cmdArguments.StartPosition;
+            Quaternion startRotation = cmdArguments.StartYaw;
             Vector3 destinationPosition = cmdArguments.DestinationPosition;
-            int destinationYaw = cmdArguments.DestinationYaw;
+            Quaternion targetRotation = cmdArguments.DestinationYaw;
             int speed = cmdArguments.Speed;
-
-            DroneState lastState = droneTrajectory.getLastAdded();  // TODO: better to send point A as cmdArguments
-            
-            Vector3 startPosition = lastState.Position;
-            Quaternion startRotation = lastState.YawAngle;
 
             // maybe change to float?
             int distanceMeters = (int)Vector3.Distance(startPosition, destinationPosition);
             int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
 
             int totalTime = distanceMillimeters / speed;
-            Quaternion targetRotation = Quaternion.Euler(0, destinationYaw, 0);
 
             // interpolation between start and destination vectors
             int duration = timestamp + totalTime;
@@ -129,15 +125,13 @@ namespace Interpreter
             Vector3 pointA = cmdArguments.PointA;
             Vector3 pointB = cmdArguments.PointB;
             Vector3 pointC = cmdArguments.PointC;
-            int startYaw = cmdArguments.StartYaw;
-            int destinationYaw = cmdArguments.DestinationYaw;
+            Quaternion startRotation =  cmdArguments.StartYaw;
+            Quaternion targetRotation = cmdArguments.DestinationYaw;
             int speed = cmdArguments.Speed;
 
             float distanceMeters = CalculateQuadraticBezierCurveLength(pointA, pointB, pointC);
             int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
             int totalTime = distanceMillimeters / speed;
-            Quaternion startRotation = Quaternion.Euler(0, startYaw, 0);
-            Quaternion targetRotation = Quaternion.Euler(0, destinationYaw, 0);
 
             int duration = timestamp + totalTime;
             for (int timeMoment = timestamp; timeMoment < duration; timeMoment++)
@@ -164,15 +158,13 @@ namespace Interpreter
             Vector3 pointB = cmdArguments.PointB;
             Vector3 pointC = cmdArguments.PointC;
             Vector3 pointD = cmdArguments.PointD;
-            int startYaw = cmdArguments.StartYaw;
-            int destinationYaw = cmdArguments.DestinationYaw;
+            Quaternion startRotation =  cmdArguments.StartYaw;
+            Quaternion targetRotation = cmdArguments.DestinationYaw;
             int speed = cmdArguments.Speed;
 
             float distanceMeters = CalculateCubicBezierCurveLength(pointA, pointB, pointC, pointD);
             int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
             int totalTime = distanceMillimeters / speed;
-            Quaternion startRotation = Quaternion.Euler(0, startYaw, 0);
-            Quaternion targetRotation = Quaternion.Euler(0, destinationYaw, 0);
 
             int duration = timestamp + totalTime;
             for (int timeMoment = timestamp; timeMoment < duration; timeMoment++)

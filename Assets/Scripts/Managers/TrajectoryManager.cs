@@ -58,34 +58,19 @@ public class TrajectoryManager
             switch (cmd)
             {
                 case Command.SetPos:
-                    SetPosCommand(
-                        droneId,
-                        timestampMilliseconds,
-                        cmdArguments);
+                    SetPosCommand(droneId, timestampMilliseconds, cmdArguments);
                     break;
                 case Command.TakeOff:
-                    TakeOffCommand(
-                        droneId,
-                        timestampMilliseconds,
-                        cmdArguments);
+                    TakeOffCommand(droneId, timestampMilliseconds, cmdArguments);
                     break;
                 case Command.FlyTo:
-                    FlyToCommand(
-                        droneId,
-                        timestampMilliseconds,
-                        cmdArguments);
+                    FlyToCommand(droneId, timestampMilliseconds, cmdArguments);
                     break;
                 case Command.FlyTrajectory:
-                    FlyTrajectoryCommand(
-                        droneId,
-                        timestampMilliseconds,
-                        cmdArguments);
+                    FlyTrajectoryCommand(droneId, timestampMilliseconds, cmdArguments);
                     break;
                 case Command.FlySpiral:
-                    drones[droneId] = trajectoryGenerator.GenerateSpiralTrajectory(
-                        droneTrajectory,
-                        timestampMilliseconds,
-                        cmdArguments);
+                    drones[droneId] = trajectoryGenerator.GenerateSpiralTrajectory(droneTrajectory, timestampMilliseconds, cmdArguments);
                     break;
                 
             }  
@@ -111,11 +96,10 @@ public class TrajectoryManager
         int timeLinearTrajectoryStart = timestamp;
 
         Vector3 destinationPosition = new Vector3(lastPosition.x, lastPosition.y + height, lastPosition.z);
-        int defaultYaw = (int) lastState.YawAngle.eulerAngles.y; // FIXME: velmi blbe riesenie, treba prerobit
 
         CmdArgumentsDTO cmdArgumentsForLinear = new CmdArgumentsDTO(); 
         cmdArgumentsForLinear.DestinationPosition = destinationPosition;
-        cmdArgumentsForLinear.DestinationYaw = defaultYaw;
+        cmdArgumentsForLinear.DestinationYaw = lastState.YawAngle;
         cmdArgumentsForLinear.Speed = TAKEOFF_SPEED;
         
         if (timeLastStateEndPlusOne < timeLinearTrajectoryStart) 
@@ -151,7 +135,7 @@ public class TrajectoryManager
             cmdArgumentsForBezier.PointB = pointB;
             cmdArgumentsForBezier.PointC = pointC;
             cmdArgumentsForBezier.Speed = cmdArguments.Speed;
-            cmdArgumentsForBezier.StartYaw = (int) bezierTrajectoryStartState.YawAngle.eulerAngles.y;
+            cmdArgumentsForBezier.StartYaw = bezierTrajectoryStartState.YawAngle;
             cmdArgumentsForBezier.DestinationYaw = cmdArguments.DestinationYaw;
             
             drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(drones[droneId], timestamp, cmdArgumentsForBezier);
@@ -164,6 +148,8 @@ public class TrajectoryManager
                                 timeLinearTrajectoryStart, 
                                 lastState
                             );
+            cmdArguments.StartPosition = lastState.Position;
+            cmdArguments.StartYaw = lastState.YawAngle;  
             drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(drones[droneId], timestamp, cmdArguments);
         }
     }
@@ -198,7 +184,7 @@ public class TrajectoryManager
         cmdArgumentsForStartBezier.PointB = T1;
         cmdArgumentsForStartBezier.PointC = B;
         cmdArgumentsForStartBezier.Speed = B_DTO.Speed;
-        cmdArgumentsForStartBezier.StartYaw = (int) lastState.YawAngle.eulerAngles.y;
+        cmdArgumentsForStartBezier.StartYaw = lastState.YawAngle;
         cmdArgumentsForStartBezier.DestinationYaw = B_DTO.DestinationYaw;
 
         drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(drones[droneId], timeLastStateEndPlusOne, cmdArgumentsForStartBezier);

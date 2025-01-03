@@ -53,8 +53,7 @@ namespace Utility
                 new Color(0.1f, 0.7f, 0.1f), // Dark Green
                 new Color(0.1f, 0.1f, 0.7f) // Dark Blue
             };
-
-            return contrastColors[index % 20];
+            return contrastColors[Mathf.Abs(index) % contrastColors.Count()];
         }
     }
 }

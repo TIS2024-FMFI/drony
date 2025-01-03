@@ -161,7 +161,7 @@ namespace Interpreter
 
             CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
             cmdArgumentsDTO.DestinationPosition = new Vector3(x, y, z);
-            cmdArgumentsDTO.DestinationYaw = destinationYaw;
+            cmdArgumentsDTO.DestinationYaw = Quaternion.Euler(0, destinationYaw, 0);
             cmdArgumentsDTO.Speed = speed;
 
             return cmdArgumentsDTO;
@@ -203,7 +203,7 @@ namespace Interpreter
                 int.TryParse(pointData[4], out var speed);
                 PointDTO pointDTO = new PointDTO();
                 pointDTO.Point = new Vector3(x, y, z);
-                pointDTO.DestinationYaw = destinationYaw;
+                pointDTO.DestinationYaw = Quaternion.Euler(0, destinationYaw, 0);
                 pointDTO.Speed = speed;
                 cmdArgumentsDTO.Points.Add(pointDTO);
             }

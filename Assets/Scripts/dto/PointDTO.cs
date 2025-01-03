@@ -9,7 +9,7 @@ namespace Drony.dto
     {
         public Vector3 Point { get; set; }
         public int Speed { get; set; }
-        public int DestinationYaw { get; set; }
+        public Quaternion DestinationYaw { get; set; }
 
         public void copy(PointDTO other)
         {

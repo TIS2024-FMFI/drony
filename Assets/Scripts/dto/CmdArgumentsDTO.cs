@@ -7,9 +7,9 @@ namespace Drony.dto
     public class CmdArgumentsDTO 
     {
         public Vector3 StartPosition { get; set; }
-        public int StartYaw { get; set; }
+        public Quaternion StartYaw { get; set; }
         public Vector3 DestinationPosition { get; set; }
-        public int DestinationYaw { get; set; }
+        public Quaternion DestinationYaw { get; set; }
         public int DestinationHeight { get; set; }
         public int Speed { get; set; }
         public Vector3 PointA { get; set; }

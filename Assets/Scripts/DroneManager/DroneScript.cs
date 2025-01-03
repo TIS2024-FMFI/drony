@@ -20,6 +20,8 @@ public class DroneScript : MonoBehaviour
     private List<GizmosState> markerPositions = new List<GizmosState>();
     private Color color;
     private GUIStyle style;
+    private Vector3 previousBezierPoint;
+    private bool previousBezierPointSet = false;
 
     public float speed;
 
@@ -74,17 +76,29 @@ public class DroneScript : MonoBehaviour
             }
             Vector3 position = droneState.Position;
             string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
-            Handles.Label(position, text, style);
+            //Handles.Label(position, text, style);
+            //Gizmos.DrawSphere(position, 0.1f);
         }
-        // foreach(Vector3 position in trajectoryManager.GetBezierPoints())
-        // {
-        //     string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
-        //     GUIStyle styleBezier = new GUIStyle(style);
-        //     styleBezier.normal.textColor = Color.red;
-        //     Handles.Label(position, text, styleBezier);
-        //     Gizmos.color = Color.red;
-        //     Gizmos.DrawSphere(position, 0.05f);
-        // }
+        foreach(Vector3 position in trajectoryManager.GetBezierPoints())
+        {
+            string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
+            GUIStyle styleBezier = new GUIStyle(style);
+            styleBezier.normal.textColor = Color.red;
+            // Handles.Label(position, text, styleBezier);
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(position, 0.05f);
+
+            if (!previousBezierPointSet)
+            {
+                previousBezierPoint = position;
+                previousBezierPointSet = true;
+            } 
+            else 
+            {
+                Gizmos.DrawLine(previousBezierPoint, position);
+                previousBezierPointSet = false;
+            }
+        }
         foreach (GizmosState marker in markerPositions)
         {
             Gizmos.color = marker.Color;

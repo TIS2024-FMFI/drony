@@ -83,7 +83,7 @@ namespace Interpreter
             int destinationYaw = cmdArguments.DestinationYaw;
             int speed = cmdArguments.Speed;
 
-            DroneState lastState = droneTrajectory.getLastAdded();
+            DroneState lastState = droneTrajectory.getLastAdded();  // TODO: better to send point A as cmdArguments
             
             Vector3 startPosition = lastState.Position;
             Quaternion startRotation = lastState.YawAngle;
@@ -125,44 +125,89 @@ namespace Interpreter
                         int timestamp, 
                         CmdArgumentsDTO cmdArguments)
         {
-            // TODO: !!! Doesn't solve rotation for now. The previous rotation should be brought from the highter level
-            // There should be a layer that is going to do all checkings and call this function to calculate pure trajectory
-            
             Debug.Log($"GenerateQuadraticBezierTrajectory, time start: {timestamp}");
             Vector3 pointA = cmdArguments.PointA;
             Vector3 pointB = cmdArguments.PointB;
             Vector3 pointC = cmdArguments.PointC;
-            //int destinationYaw = cmdArguments.DestinationYaw;
+            int startYaw = cmdArguments.StartYaw;
+            int destinationYaw = cmdArguments.DestinationYaw;
             int speed = cmdArguments.Speed;
-            float distanceMeters = CalculateBezierCurveLength(pointA, pointB, pointC);
-            int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
 
+            float distanceMeters = CalculateQuadraticBezierCurveLength(pointA, pointB, pointC);
+            int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
             int totalTime = distanceMillimeters / speed;
-            //Quaternion targetRotation = Quaternion.Euler(0, destinationYaw, 0);
+            Quaternion startRotation = Quaternion.Euler(0, startYaw, 0);
+            Quaternion targetRotation = Quaternion.Euler(0, destinationYaw, 0);
 
             int duration = timestamp + totalTime;
             for (int timeMoment = timestamp; timeMoment < duration; timeMoment++)
             {
                 int localTimeMoment = timeMoment - timestamp;
                 float t = localTimeMoment / (float) totalTime;
+                Quaternion yaw = Quaternion.Slerp(startRotation, targetRotation, t);
                 Vector3 point = GetQuadraticBezierPositionByTime(t, pointA, pointB, pointC);
                 droneTrajectory[timeMoment].Position = point;
+                droneTrajectory[timeMoment].YawAngle = yaw;
                 droneTrajectory.LastStateIndex = timeMoment;
             }
             Debug.Log($"GenerateQuadraticBezierTrajectory, time end: {droneTrajectory.LastStateIndex}");
             return droneTrajectory;
-
         }
-        private Vector3 GetQuadraticBezierPositionByTime(float Time, Vector3 pointA, Vector3 pointB, Vector3 pointC) 
+
+        public DroneTrajectory GenerateCubicBezierTrajectory(
+                        DroneTrajectory droneTrajectory, 
+                        int timestamp, 
+                        CmdArgumentsDTO cmdArguments)
+        {
+            Debug.Log($"GenerateCubicBezierTrajectory, time start: {timestamp}");
+            Vector3 pointA = cmdArguments.PointA;
+            Vector3 pointB = cmdArguments.PointB;
+            Vector3 pointC = cmdArguments.PointC;
+            Vector3 pointD = cmdArguments.PointD;
+            int startYaw = cmdArguments.StartYaw;
+            int destinationYaw = cmdArguments.DestinationYaw;
+            int speed = cmdArguments.Speed;
+
+            float distanceMeters = CalculateCubicBezierCurveLength(pointA, pointB, pointC, pointD);
+            int distanceMillimeters = Utilities.ConvertFromMetersToMillimeters(distanceMeters);
+            int totalTime = distanceMillimeters / speed;
+            Quaternion startRotation = Quaternion.Euler(0, startYaw, 0);
+            Quaternion targetRotation = Quaternion.Euler(0, destinationYaw, 0);
+
+            int duration = timestamp + totalTime;
+            for (int timeMoment = timestamp; timeMoment < duration; timeMoment++)
+            {
+                int localTimeMoment = timeMoment - timestamp;
+                float t = localTimeMoment / (float) totalTime;
+                Quaternion yaw = Quaternion.Slerp(startRotation, targetRotation, t);
+                Vector3 point = GetCubicBezierPositionByTime(t, pointA, pointB, pointC, pointD);
+                droneTrajectory[timeMoment].Position = point;
+                droneTrajectory[timeMoment].YawAngle = yaw;
+                droneTrajectory.LastStateIndex = timeMoment;
+            }
+            Debug.Log($"GenerateCubicBezierTrajectory, time end: {droneTrajectory.LastStateIndex}");
+            return droneTrajectory;
+        }
+
+        private Vector3 GetQuadraticBezierPositionByTime(float Time, Vector3 A, Vector3 B, Vector3 C) 
         {
             Time = Mathf.Clamp01(Time);
             float invTime = 1 - Time;
-            return (invTime * invTime * pointA)
-                + (2 * invTime * Time * pointB)
-                + (Time * Time * pointC);
+            return (invTime * invTime * A)
+                + (2 * invTime * Time * B)
+                + (Time * Time * C);
+        }
+        private Vector3 GetCubicBezierPositionByTime(float Time, Vector3 A, Vector3 B, Vector3 C, Vector3 D) 
+        {
+            Time = Mathf.Clamp01(Time);
+            float invTime = 1 - Time;
+            return (invTime * invTime * invTime * A)
+                + (3 * invTime * invTime * Time * B)
+                + (3 * invTime * Time * Time * C)
+                + (Time * Time * Time * D);
         }
 
-         private float CalculateBezierCurveLength(Vector3 A, Vector3 B, Vector3 C, int subdivisions = 100)
+        private float CalculateQuadraticBezierCurveLength(Vector3 A, Vector3 B, Vector3 C, int subdivisions = 100)
         {
             float totalLength = 0f;
 
@@ -177,9 +222,7 @@ namespace Interpreter
                 float t = i * step;
 
                 // Calculate the current point on the curve
-                Vector3 currentPoint = Mathf.Pow(1 - t, 2) * A +
-                                    2 * (1 - t) * t * B +
-                                    Mathf.Pow(t, 2) * C;
+                Vector3 currentPoint = GetQuadraticBezierPositionByTime(t, A, B, C);
 
                 // Add the distance between the previous point and the current point
                 totalLength += Vector3.Distance(previousPoint, currentPoint);
@@ -190,6 +233,35 @@ namespace Interpreter
 
             return totalLength;
         }
+
+        private float CalculateCubicBezierCurveLength(Vector3 A, Vector3 B, Vector3 C, Vector3 D, int subdivisions = 100)
+        {
+            float totalLength = 0f;
+
+            // Previous point on the curve
+            Vector3 previousPoint = A;
+
+            // Step size
+            float step = 1f / subdivisions;
+
+            for (int i = 1; i <= subdivisions; i++)
+            {
+                float t = i * step;
+
+                // Calculate the current point on the curve
+                Vector3 currentPoint = GetCubicBezierPositionByTime(t, A, B, C, D);
+
+                // Add the distance between the previous point and the current point
+                totalLength += Vector3.Distance(previousPoint, currentPoint);
+
+                // Update the previous point
+                previousPoint = currentPoint;
+            }
+
+            return totalLength;
+        }
+
+
 
         public DroneTrajectory GenerateSpiralTrajectory(
                         DroneTrajectory droneTrajectory, 

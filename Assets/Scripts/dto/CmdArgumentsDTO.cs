@@ -7,6 +7,7 @@ namespace Drony.dto
     public class CmdArgumentsDTO 
     {
         public Vector3 StartPosition { get; set; }
+        public int StartYaw { get; set; }
         public Vector3 DestinationPosition { get; set; }
         public int DestinationYaw { get; set; }
         public int DestinationHeight { get; set; }
@@ -14,6 +15,8 @@ namespace Drony.dto
         public Vector3 PointA { get; set; }
         public Vector3 PointB { get; set; }
         public Vector3 PointC { get; set; }
+        public Vector3 PointD { get; set; }
+        public List<PointDTO> Points { get; set; }
         public bool IsClockwise { get; set; }
         public int NumberOfRevolutions { get; set; }
         public string Name { get; set; }

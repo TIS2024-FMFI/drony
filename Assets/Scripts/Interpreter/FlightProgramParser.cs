@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
+using System.Windows.Forms;
 using Drony.dto;
+using Unity.VisualScripting.ReorderableList.Element_Adder_Menu;
 using UnityEngine;
 
 namespace Interpreter
@@ -40,6 +43,46 @@ namespace Interpreter
 
             return split.Take(commentIndex).ToList();
         }
+        private bool IsList(string input)
+        {
+            return input.StartsWith('[') && input.EndsWith(']');
+        }
+
+        private bool ContanisList(string input)
+        {
+            return input.Contains('[') && input.Contains(']');
+        }
+
+        private string RemoveBrackets(string input)
+        {
+            return input.Substring(1, input.Length - 2);
+        }
+
+        private List<string> ParseList(string input)
+        {
+            input = input.Trim();
+            if (IsList(input))
+            {
+                input = RemoveBrackets(input);
+            }
+            string[] elements = input.Split(',');
+            var result = elements.Select(e => e.Trim().Trim('\'', '"')).ToList();
+
+            return result;
+        }
+
+        private List<string> ParseListForTrajectory(string input)
+        {
+            input = input.Trim();
+            string pattern = @"\[(.*?)\]";
+            var matches = Regex.Matches(input, pattern);
+            var result = new List<string>();
+            foreach (Match match in matches)
+            {
+                result.Add(match.ToString());
+            }
+            return result;
+        }
 
         public (TimeSpan, string, Command, CmdArgumentsDTO) NextCommand()
         {
@@ -74,12 +117,34 @@ namespace Interpreter
                 _ => Command.Error
             };
 
+            string arguments = string.Join(" ", line.Skip(3).Take(line.Count - 3));
+            List<string> argumentsList = new List<string>();
+
+            if (IsList(arguments))
+            {
+                string withoutBrackets = RemoveBrackets(arguments);
+
+                if (ContanisList(withoutBrackets))
+                {
+                    argumentsList = ParseListForTrajectory(withoutBrackets);
+                } 
+                else 
+                {
+                    argumentsList = ParseList(arguments);
+                }
+            }
+            else 
+            {
+                argumentsList = line.Skip(3).ToList();
+            }
+
             var cmdArgumentsDTO = command switch
             {
-                Command.TakeOff => ParseTakeOffArgs(line.Skip(3).ToList()),
-                Command.SetPos => ParseSetPositionArgs(line.Skip(3).ToList()),
-                Command.FlyTo => ParseLinearTrajectoryArgs(line.Skip(3).ToList()),
-                Command.FlySpiral => ParseSpiralTrajectoryArgs(line.Skip(3).ToList()),
+                Command.TakeOff => ParseTakeOffArgs(argumentsList),
+                Command.SetPos => ParseSetPositionArgs(argumentsList),
+                Command.FlyTo => ParseLinearTrajectoryArgs(argumentsList),
+                Command.FlyTrajectory => ParseTrajectoryArgs(argumentsList),
+                Command.FlySpiral => ParseSpiralTrajectoryArgs(argumentsList),
                 _ => new CmdArgumentsDTO()
             };
             
@@ -121,6 +186,27 @@ namespace Interpreter
             CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
             cmdArgumentsDTO.DestinationHeight = height;
 
+            return cmdArgumentsDTO;
+        }
+
+        private CmdArgumentsDTO ParseTrajectoryArgs(List<string> args)
+        {
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.Points = new List<PointDTO>();
+            foreach (String arg in args)
+            {
+                List<string> pointData = ParseList(arg);
+                int.TryParse(pointData[0], out var x);
+                int.TryParse(pointData[1], out var y);
+                int.TryParse(pointData[2], out var z);
+                int.TryParse(pointData[3], out var destinationYaw);
+                int.TryParse(pointData[4], out var speed);
+                PointDTO pointDTO = new PointDTO();
+                pointDTO.Point = new Vector3(x, y, z);
+                pointDTO.DestinationYaw = destinationYaw;
+                pointDTO.Speed = speed;
+                cmdArgumentsDTO.Points.Add(pointDTO);
+            }
             return cmdArgumentsDTO;
         }
         

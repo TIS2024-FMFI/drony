@@ -76,6 +76,15 @@ public class DroneScript : MonoBehaviour
             string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
             Handles.Label(position, text, style);
         }
+        // foreach(Vector3 position in trajectoryManager.GetBezierPoints())
+        // {
+        //     string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
+        //     GUIStyle styleBezier = new GUIStyle(style);
+        //     styleBezier.normal.textColor = Color.red;
+        //     Handles.Label(position, text, styleBezier);
+        //     Gizmos.color = Color.red;
+        //     Gizmos.DrawSphere(position, 0.05f);
+        // }
         foreach (GizmosState marker in markerPositions)
         {
             Gizmos.color = marker.Color;

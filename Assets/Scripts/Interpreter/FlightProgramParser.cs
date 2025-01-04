@@ -242,16 +242,16 @@ namespace Interpreter
             int.TryParse(args[0], out var x);
             int.TryParse(args[1], out var y);
             int.TryParse(args[2], out var z);
-            int.TryParse(args[3], out var xA);
-            int.TryParse(args[4], out var yA);
-            int.TryParse(args[5], out var zA);
+            int.TryParse(args[3], out var xO);
+            int.TryParse(args[4], out var yO);
+            int.TryParse(args[5], out var zO);
             int.TryParse(args[6], out var clockwise);
             int.TryParse(args[7], out var numberOfRevolutions);
             int.TryParse(args[8], out var speed);
 
             CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
             cmdArgumentsDTO.DestinationPosition = new Vector3(x, y, z);
-            cmdArgumentsDTO.PointA = new Vector3(xA, yA, zA);
+            cmdArgumentsDTO.PointO = new Vector3(xO, yO, zO);
             cmdArgumentsDTO.IsClockwise = clockwise == 1;
             cmdArgumentsDTO.NumberOfRevolutions = numberOfRevolutions;
             cmdArgumentsDTO.Speed = speed;

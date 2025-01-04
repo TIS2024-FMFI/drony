@@ -108,14 +108,6 @@ namespace Interpreter
             return droneTrajectory;
         }
 
-        public DroneTrajectory GenerateCircularTrajectory(
-                        DroneTrajectory droneTrajectory, 
-                        int timestamp, 
-                        CmdArgumentsDTO cmdArguments)
-        {
-            throw new NotImplementedException("GenerateCircularTrajectory is not implemented yet.");
-        }
-
         public DroneTrajectory GenerateQuadraticBezierTrajectory(
                         DroneTrajectory droneTrajectory, 
                         int timestamp, 

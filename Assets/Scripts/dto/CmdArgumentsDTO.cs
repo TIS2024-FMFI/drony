@@ -17,6 +17,7 @@ namespace Drony.dto
         public Vector3 PointB { get; set; }
         public Vector3 PointC { get; set; }
         public Vector3 PointD { get; set; }
+        public Vector3 PointO { get; set; }
         public List<PointDTO> Points { get; set; }
         public bool IsClockwise { get; set; }
         public int NumberOfRevolutions { get; set; }

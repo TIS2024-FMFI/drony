@@ -249,8 +249,6 @@ public class TrajectoryManager
 
             timeTrajectoryStart = drones[droneId].getLastAdded().Time + 1; 
         }
-
-
     }
 
     private void FlyApproxTrajectory(string droneId, int timestamp, CmdArgumentsDTO cmdArguments, float smoothness)
@@ -389,7 +387,7 @@ public class TrajectoryManager
         DroneState lastState = drones[droneId].getLastAdded();
 
         Vector3 StartPosition = lastState.Position;
-        Vector3 A = cmdArguments.PointA;
+        Vector3 O = cmdArguments.PointO;
         Vector3 DestinationPosition = cmdArguments.DestinationPosition;
         int numberOfRevolutions = cmdArguments.NumberOfRevolutions;
         bool isClockwise = cmdArguments.IsClockwise;
@@ -414,7 +412,7 @@ public class TrajectoryManager
             foreach (int angle in angles)
             {
                 PointDTO point = new PointDTO();
-                point.Point = FindPointOnCircle(A, StartPosition, DestinationPosition, angle);
+                point.Point = FindPointOnCircle(O, StartPosition, DestinationPosition, angle);
                 point.Speed = cmdArguments.Speed;
                 points.Add(point);
             }
@@ -425,7 +423,13 @@ public class TrajectoryManager
         points.Add(DestinationPoint);
 
         cmdArguments.Points = points;
-        FlyApproxTrajectory(droneId, timestamp, cmdArguments, Vector3.Distance(StartPosition, A) / 2);
+        FlyApproxTrajectory(droneId, timestamp, cmdArguments, Vector3.Distance(StartPosition, O) / 2);
+    }
+
+    private void FlySpiralTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--FlySpiralTrajectoryCommand");
+
     }
 
     private void DroneModeCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)

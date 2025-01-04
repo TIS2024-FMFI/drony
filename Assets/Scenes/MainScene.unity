@@ -1271,6 +1271,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 814135698}
     m_Modifications:
+    - target: {fileID: 2960350397817460366, guid: c50bc230f6595ba4a92e9b388604b76c, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3141941391166989384, guid: c50bc230f6595ba4a92e9b388604b76c, type: 3}
       propertyPath: m_Name
       value: TimeBar

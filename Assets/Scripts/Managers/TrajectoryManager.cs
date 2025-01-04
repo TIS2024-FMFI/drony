@@ -181,22 +181,56 @@ public class TrajectoryManager
         drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(drones[droneId], timestamp, cmdArgumentsForBezier);
     }
 
+    private void FlyCubicBezier(string droneId, int timestamp, Vector3 A, Vector3 B, Vector3 C, Vector3 D, int speed, Quaternion startYaw, Quaternion destinationYaw)
+    {
+        CmdArgumentsDTO cmdArgumentsForBezier = new CmdArgumentsDTO(); 
+        cmdArgumentsForBezier.PointA = A;
+        cmdArgumentsForBezier.PointB = B;
+        cmdArgumentsForBezier.PointC = C;
+        cmdArgumentsForBezier.PointD = D;
+        cmdArgumentsForBezier.Speed = speed;
+        cmdArgumentsForBezier.StartYaw = startYaw;
+        cmdArgumentsForBezier.DestinationYaw = destinationYaw;
+
+        drones[droneId] = trajectoryGenerator.GenerateCubicBezierTrajectory(drones[droneId], timestamp, cmdArgumentsForBezier);
+    }
+
 
     private void FlyTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log("--FlyTrajectoryCommand");
-        // TODO: insert hover or bezier between last and new
         DroneState lastState = drones[droneId].getLastAdded();
         int timeLastStateEndPlusOne = lastState.Time + 1;
         int timeTrajectoryStart = timestamp;
 
+        if (ThereIsANeedToHoverAndWait(timeLastStateEndPlusOne, timeTrajectoryStart)) 
+        {
+            drones[droneId] = trajectoryGenerator.GenerateHoverTrajectory(
+                                new DroneTrajectory(drones[droneId]), 
+                                timeLastStateEndPlusOne, 
+                                timeTrajectoryStart, 
+                                lastState
+                            );
+        }
+
+
         List<PointDTO> points = cmdArguments.Points;
-        if (points == null) {
-            throw new InvalidOperationException("List is null");
+        if (points == null || points.Count == 0) {
+            throw new InvalidOperationException("Trajectory is empty");
         }
-        if (points.Count < 2) {
-            // generate linear
+        if (points.Count == 1) {
+            // generate linear in case there is only one point
+            PointDTO pointDTO = points[0];
+            cmdArguments.StartPosition = lastState.Position;
+            cmdArguments.StartYaw = lastState.YawAngle;
+            cmdArguments.DestinationPosition = pointDTO.Point;
+            cmdArguments.DestinationYaw = pointDTO.DestinationYaw;
+            cmdArguments.Speed = pointDTO.Speed;
+
+            FlyToCommand(droneId, timeTrajectoryStart, cmdArguments);
+            return;
         }
+
         PointDTO A_DTO = new PointDTO();
         PointDTO B_DTO = points[0];
         PointDTO C_DTO = points[1];
@@ -208,15 +242,33 @@ public class TrajectoryManager
 
         (Vector3 T1, Vector3 T2) = GetSmoothPointsForBezier(A, B, C);
 
-        CmdArgumentsDTO cmdArgumentsForStartBezier = new CmdArgumentsDTO(); 
-        cmdArgumentsForStartBezier.PointA = A;
-        cmdArgumentsForStartBezier.PointB = T1;
-        cmdArgumentsForStartBezier.PointC = B;
-        cmdArgumentsForStartBezier.Speed = B_DTO.Speed;
-        cmdArgumentsForStartBezier.StartYaw = lastState.YawAngle;
-        cmdArgumentsForStartBezier.DestinationYaw = B_DTO.DestinationYaw;
+        if (NewTrajectoryStartsBeforePreviousEnds(timeLastStateEndPlusOne, timeTrajectoryStart)) 
+        {
+            DroneState bezierTrajectoryStartState = drones[droneId][timeTrajectoryStart];
+            FlyCubicBezier(
+                A: bezierTrajectoryStartState.Position,
+                B: A,
+                C: T1,
+                D: B,
+                droneId: droneId,
+                timestamp: timeTrajectoryStart,
+                speed: B_DTO.Speed,
+                startYaw: bezierTrajectoryStartState.YawAngle,
+                destinationYaw: B_DTO.DestinationYaw
+            );
+        } else {
+            FlyQuadraticBezier(
+                A: A,
+                B: T1,
+                C: B,
+                droneId: droneId,
+                timestamp: timeTrajectoryStart,
+                speed: B_DTO.Speed,
+                startYaw: lastState.YawAngle,
+                destinationYaw: B_DTO.DestinationYaw
+            );
+        }
 
-        drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(drones[droneId], timeLastStateEndPlusOne, cmdArgumentsForStartBezier);
         timeLastStateEndPlusOne = drones[droneId].getLastAdded().Time + 1; 
         drones[droneId].setLastAsKeyState();
         
@@ -239,16 +291,18 @@ public class TrajectoryManager
 
             (T1, T2) = GetSmoothPointsForBezier(A, B, C);
 
-            CmdArgumentsDTO cmdArgumentsForCubicBezier = new CmdArgumentsDTO(); 
-            cmdArgumentsForCubicBezier.PointA = A;
-            cmdArgumentsForCubicBezier.PointB = S1;
-            cmdArgumentsForCubicBezier.PointC = T1;
-            cmdArgumentsForCubicBezier.PointD = B;
-            cmdArgumentsForCubicBezier.Speed = B_DTO.Speed;
-            cmdArgumentsForCubicBezier.StartYaw = A_DTO.DestinationYaw;
-            cmdArgumentsForCubicBezier.DestinationYaw = B_DTO.DestinationYaw;
+            FlyCubicBezier(
+                A: A,
+                B: S1,
+                C: T1,
+                D: B,
+                droneId: droneId,
+                timestamp: timeLastStateEndPlusOne,
+                speed: B_DTO.Speed,
+                startYaw: A_DTO.DestinationYaw,
+                destinationYaw: B_DTO.DestinationYaw
+            );
 
-            drones[droneId] = trajectoryGenerator.GenerateCubicBezierTrajectory(drones[droneId], timeLastStateEndPlusOne, cmdArgumentsForCubicBezier);
             timeLastStateEndPlusOne = drones[droneId].getLastAdded().Time + 1;
             drones[droneId].setLastAsKeyState();
             
@@ -260,14 +314,16 @@ public class TrajectoryManager
         A = A_DTO.Point;
         B = B_DTO.Point;
 
-        cmdArgumentsForStartBezier.PointA = A;
-        cmdArgumentsForStartBezier.PointB = S1;
-        cmdArgumentsForStartBezier.PointC = B;
-        cmdArgumentsForStartBezier.Speed = B_DTO.Speed;
-        cmdArgumentsForStartBezier.StartYaw = A_DTO.DestinationYaw;
-        cmdArgumentsForStartBezier.DestinationYaw = B_DTO.DestinationYaw;
-
-        drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(drones[droneId], timeLastStateEndPlusOne, cmdArgumentsForStartBezier);
+        FlyQuadraticBezier(
+            A: A,
+            B: S1,
+            C: B,
+            droneId: droneId,
+            timestamp: timeLastStateEndPlusOne,
+            speed: B_DTO.Speed,
+            startYaw: A_DTO.DestinationYaw,
+            destinationYaw: B_DTO.DestinationYaw
+        );
     }
 
     private (Vector3 T1, Vector3 T2) GetSmoothPointsForBezier(Vector3 A, Vector3 B, Vector3 C)

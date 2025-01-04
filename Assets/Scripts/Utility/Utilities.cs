@@ -21,6 +21,10 @@ namespace Utility
         {
             return (int) meter * MILLIMETERS_IN_ONE_METER;
         }
+        public static float ConvertFromMillisecondsToSeconds(int ms)
+        {
+            return ms / MILLIS_IN_SEC;
+        }
         public static string ReadTextFile(string path)
         {
             return File.ReadAllText(path);

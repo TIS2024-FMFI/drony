@@ -9,10 +9,15 @@ public class TimeBarController : MonoBehaviour
     private Button playPauseButton;
     private Button restartButton;
 
-    private float totalTimeLength = 180f; //3 min
-    private float currentTime = 0f;
+    private int totalTimeLength = 180000; //3 min
+    private int currentTime = 0;
     private bool isTiming = false;
     private float timeMultiplier = 1f;
+    private UIManager uimanager;
+    void OnEnable()
+    {
+        uimanager = UIManager.Instance;
+    }
 
     void Start()
     {
@@ -32,21 +37,24 @@ public class TimeBarController : MonoBehaviour
         SetTotalTime(totalTimeLength);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (isTiming)
         {
-            currentTime += Time.deltaTime * timeMultiplier;
+            currentTime = uimanager.GetCurrentTime();
             if (currentTime >= totalTimeLength)
             {
-                currentTime = totalTimeLength;
+                uimanager.SetCurrentTime(totalTimeLength);
+                currentTime = uimanager.GetCurrentTime();
                 isTiming = false;
                 playPauseButton.text = "Play";
             }
-
+            uimanager.UpdateCurrentTime();
             UpdateCurrentTime(currentTime);
             UpdateTimeProgressBar(currentTime, totalTimeLength);
         }
+        totalTimeLength = uimanager.GetTotalTime();
+        SetTotalTime(totalTimeLength);
     }
 
     private void TogglePlayPause()
@@ -58,20 +66,21 @@ public class TimeBarController : MonoBehaviour
     private void RestartTimer()
     {
         isTiming = false;
-        currentTime = 0f;
+        currentTime = 0;
+        uimanager.ResetCurrentTime();
         UpdateCurrentTime(currentTime);
         UpdateTimeProgressBar(currentTime, totalTimeLength);
         playPauseButton.text = "Play";
     }
 
-    private void SetTotalTime(float lengthInSeconds)
+    private void SetTotalTime(float lengthInMilliseconds)
     {
-        totalTimeLabel.text = FormatTime(lengthInSeconds);
+        totalTimeLabel.text = FormatTime(lengthInMilliseconds);
     }
 
-    private void UpdateCurrentTime(float timeInSeconds)
+    private void UpdateCurrentTime(float lengthInMilliseconds)
     {
-        currentTimeLabel.text = FormatTime(timeInSeconds);
+        currentTimeLabel.text = FormatTime(lengthInMilliseconds);
     }
 
     private void UpdateTimeProgressBar(float current, float total)
@@ -85,11 +94,14 @@ public class TimeBarController : MonoBehaviour
         timeMultiplier = multiplier;
     }
 
-    private string FormatTime(float timeInSeconds)
-    {
-        int hours = Mathf.FloorToInt(timeInSeconds / 3600);
-        int minutes = Mathf.FloorToInt((timeInSeconds % 3600) / 60);
-        int seconds = Mathf.FloorToInt(timeInSeconds % 60);
-        return $"{hours:D1}:{minutes:D2}:{seconds:D2}";
-    }
+    private string FormatTime(float timeInMilliseconds)
+{
+    float timeInSeconds = timeInMilliseconds / 1000f;
+
+    int hours = Mathf.FloorToInt(timeInSeconds / 3600);
+    int minutes = Mathf.FloorToInt((timeInSeconds % 3600) / 60);
+    int seconds = Mathf.FloorToInt(timeInSeconds % 60);
+    int milliseconds = Mathf.FloorToInt(timeInMilliseconds % 1000);
+    return $"{hours:D1}:{minutes:D2}:{seconds:D2}.{milliseconds:D3}";
+}
 }

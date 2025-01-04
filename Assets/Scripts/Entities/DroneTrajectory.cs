@@ -76,7 +76,7 @@ namespace Drony.Entities
             return this[LastStateIndex];
         }
 
-        public DroneState getNext(int playbackSpeed, int currentStateIndex) {
+        public DroneState getNext(int currentStateIndex) {
             
             if (currentStateIndex < 0 || currentStateIndex >= Trajectory.Count) {
                 // TODO: implement custom exception

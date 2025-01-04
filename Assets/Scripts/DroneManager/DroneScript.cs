@@ -50,19 +50,14 @@ public class DroneScript : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate() // 100fps should be
     {
-        DroneState currentState = trajectoryManager.GetStateAtTime(1, id);
+        DroneState currentState = trajectoryManager.GetCurrentDroneState(id);
         transform.position = currentState.Position;
         transform.rotation = currentState.YawAngle;
         currentTime = currentState.Time;
-        AddMarker(transform.position, currentState.IsKeyState);
-        // for debugging:
-        // if (currentState.IsKeyState) {
-        //     float elapsedTime = Time.time - startTime;
-        //     Debug.Log($"Estimated: {currentState.Time}. Elapsed: {elapsedTime}");
-        // }
+        AddMarker(transform.position);
     }
 
-    private void AddMarker(Vector3 position, bool isKeyState)
+    private void AddMarker(Vector3 position)
     {
         markerPositions.Add(new GizmosState(position, color, "", style));
     }

@@ -66,5 +66,29 @@ public class UIManager
     {
         return commandFileName;
     }
+    public int GetTotalTime()
+    {
+        return trajectoryManager.totalTime;
+    }
+    public int GetCurrentTime()
+    {
+        return trajectoryManager.GetCurrentTime();
+    }
+    public void UpdateCurrentTime()
+    {
+        trajectoryManager.UpdateCurrentTime();
+    }
+    public void SetCurrentTime(int time)
+    {
+        trajectoryManager.SetCurrentTime(time);
+    }
+    public void SetPlaybackSpeed(int playbackSpeed)
+    {
+        trajectoryManager.SetPlaybackSpeed(playbackSpeed);
+    }
+    public void ResetCurrentTime()
+    {
+        trajectoryManager.ResetCurrentTime();
+    }
 }
 

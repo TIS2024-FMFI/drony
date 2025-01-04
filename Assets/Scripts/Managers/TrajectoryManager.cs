@@ -13,11 +13,13 @@ using Drony.dto;
 public class TrajectoryManager 
 {
     private Dictionary<string, DroneTrajectory> drones;
-    private int currentStateIndex;
+    private int currentTime = 0;
     private TrajectoryGenerator trajectoryGenerator;
     private FlightProgramParser _flightProgramParser;
     private int TAKEOFF_SPEED = 1; // FIXME: add an option to set it in config file or in ui
     private float SMOOTHNESS = 0.5f; // in m
+    public int totalTime = 0;
+    private int PlaybackSpeed = 1;
     private List<Vector3> bezierPoints = new List<Vector3>();
     private static TrajectoryManager _instance;
     public static TrajectoryManager Instance
@@ -36,7 +38,6 @@ public class TrajectoryManager
     {
         drones = new Dictionary<string, DroneTrajectory>();
         trajectoryGenerator = new TrajectoryGenerator();
-        currentStateIndex = 0;
     }
 
     public void LoadTrajectories(List<string> droneCommands)
@@ -81,6 +82,7 @@ public class TrajectoryManager
                 
             }  
             drones[droneId].setLastAsKeyState();
+            UpdateTotalTime(droneId);
         }
     }
     private void SetPosCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
@@ -500,26 +502,14 @@ public class TrajectoryManager
     }
 
 
-    private DroneState GetNextDroneState(int playbackSpeed, string droneId) {
-            int gapInMillis = Utilities.ConvertFromPlaybackSpeedToMillisGap(playbackSpeed);
-            DroneState currentDroneState = drones[droneId].getNext(playbackSpeed, currentStateIndex);
-            currentStateIndex += gapInMillis;
+    public DroneState GetCurrentDroneState(string droneId) {
+            DroneState currentDroneState = drones[droneId].getNext(currentTime);
             return currentDroneState;
     }
     public List<string> GetDroneIds() {
         List<string> ids = new List<string>();
         ids.AddRange(drones.Keys);
         return ids;
-    }
-    public DroneState GetStateAtTime(int playbackSpeed, string droneId)
-    {
-        try {
-            return GetNextDroneState(playbackSpeed, droneId);
-        } catch(ArgumentOutOfRangeException) {
-            // FIXME: ONLY for testing, i am reseting index, so the animation will loop
-            currentStateIndex = 0;
-            return GetNextDroneState(playbackSpeed, droneId);
-        }
     }
     public List<DroneState> GetKeyStates(string droneId)
     {
@@ -529,4 +519,34 @@ public class TrajectoryManager
     {
         return bezierPoints;
     }
+    private void UpdateTotalTime(string droneId)
+    {
+        int droneLastTime = drones[droneId].getLastAdded().Time;
+        if (droneLastTime > totalTime)
+        {
+            totalTime = droneLastTime;
+        }
+    }
+    public void SetPlaybackSpeed(int playbackSpeed)
+    {
+        PlaybackSpeed = playbackSpeed;
+    }
+    public void UpdateCurrentTime()
+    {
+        int gapInMillis = Utilities.ConvertFromPlaybackSpeedToMillisGap(PlaybackSpeed);
+        currentTime += gapInMillis;
+    }
+    public void SetCurrentTime(int time)
+    {
+        currentTime = time;
+    }
+    public int GetCurrentTime()
+    {
+        return currentTime;
+    }
+    public void ResetCurrentTime()
+    {
+        currentTime = 0;
+    }
+
 }

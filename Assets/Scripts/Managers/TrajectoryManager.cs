@@ -106,6 +106,8 @@ public class TrajectoryManager
         Vector3 destinationPosition = new Vector3(lastPosition.x, lastPosition.y + height, lastPosition.z);
 
         CmdArgumentsDTO cmdArgumentsForLinear = new CmdArgumentsDTO(); 
+        cmdArgumentsForLinear.StartPosition = lastPosition;
+        cmdArgumentsForLinear.StartYaw = lastState.YawAngle;
         cmdArgumentsForLinear.DestinationPosition = destinationPosition;
         cmdArgumentsForLinear.DestinationYaw = lastState.YawAngle;
         cmdArgumentsForLinear.Speed = TAKEOFF_SPEED;

@@ -76,7 +76,7 @@ public class DroneScript : MonoBehaviour
             }
             Vector3 position = droneState.Position;
             string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
-            //Handles.Label(position, text, style);
+            // Handles.Label(position, text, style);
             //Gizmos.DrawSphere(position, 0.1f);
         }
         foreach(Vector3 position in trajectoryManager.GetBezierPoints())

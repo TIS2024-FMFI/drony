@@ -108,6 +108,7 @@ namespace Interpreter
                 "take-off" => Command.TakeOff,
                 "fly-to" => Command.FlyTo,
                 "fly-spiral" => Command.FlySpiral,
+                "fly-circle" => Command.flyCircle,
                 "drone-mode" => Command.DroneMode,
                 "fly-trajectory" => Command.FlyTrajectory,
                 "land" => Command.Land,
@@ -143,6 +144,7 @@ namespace Interpreter
                 Command.FlyTo => ParseLinearTrajectoryArgs(argumentsList),
                 Command.FlyTrajectory => ParseTrajectoryArgs(argumentsList),
                 Command.FlySpiral => ParseSpiralTrajectoryArgs(argumentsList),
+                Command.flyCircle => ParseCircleTrajectoryArgs(argumentsList),
                 Command.DroneMode => ParseDroneModeArgs(argumentsList),
                 _ => new CmdArgumentsDTO()
             };
@@ -234,6 +236,29 @@ namespace Interpreter
 
             return cmdArgumentsDTO;
         }
+
+        private CmdArgumentsDTO ParseCircleTrajectoryArgs(List<string> args)
+        {
+            int.TryParse(args[0], out var x);
+            int.TryParse(args[1], out var y);
+            int.TryParse(args[2], out var z);
+            int.TryParse(args[3], out var xA);
+            int.TryParse(args[4], out var yA);
+            int.TryParse(args[5], out var zA);
+            int.TryParse(args[6], out var clockwise);
+            int.TryParse(args[7], out var numberOfRevolutions);
+            int.TryParse(args[8], out var speed);
+
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.DestinationPosition = new Vector3(x, y, z);
+            cmdArgumentsDTO.PointA = new Vector3(xA, yA, zA);
+            cmdArgumentsDTO.IsClockwise = clockwise == 1;
+            cmdArgumentsDTO.NumberOfRevolutions = numberOfRevolutions;
+            cmdArgumentsDTO.Speed = speed;
+
+            return cmdArgumentsDTO;
+        }
+
         private CmdArgumentsDTO ParseDroneModeArgs(List<string> args)
         {
             DroneMode command = args[0] switch

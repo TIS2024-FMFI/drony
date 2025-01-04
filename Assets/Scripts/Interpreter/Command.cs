@@ -7,6 +7,7 @@ namespace Interpreter
         TakeOff,
         FlyTo,
         FlySpiral,
+        flyCircle,
         DroneMode,
         FlyTrajectory,
         Land,

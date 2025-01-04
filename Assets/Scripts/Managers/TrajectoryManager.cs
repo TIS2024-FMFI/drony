@@ -75,6 +75,9 @@ public class TrajectoryManager
                 case Command.FlySpiral:
                     drones[droneId] = trajectoryGenerator.GenerateSpiralTrajectory(droneTrajectory, timestampMilliseconds, cmdArguments);
                     break;
+                case Command.flyCircle:
+                    FlyCircleTrajectoryCommand(droneId, timestampMilliseconds, cmdArguments);
+                    break;
                 
             }  
             drones[droneId].setLastAsKeyState();
@@ -206,7 +209,7 @@ public class TrajectoryManager
         } 
         else if (drones[droneId].DroneMode == DroneMode.Approx)
         {
-            FlyApproxTrajectory(droneId, timestamp, cmdArguments);
+            FlyApproxTrajectory(droneId, timestamp, cmdArguments, SMOOTHNESS);
         }
     }
     private void FlyExactTrajectory(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
@@ -240,7 +243,7 @@ public class TrajectoryManager
 
     }
 
-    private void FlyApproxTrajectory(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    private void FlyApproxTrajectory(string droneId, int timestamp, CmdArgumentsDTO cmdArguments, float smoothness)
     {
         Debug.Log("--FlyApproxTrajectoryCommand");
         DroneState lastState = drones[droneId].getLastAdded();
@@ -284,7 +287,7 @@ public class TrajectoryManager
         Vector3 B = B_DTO.Point;
         Vector3 C = C_DTO.Point;
 
-        (Vector3 T1, Vector3 T2) = GetSmoothPointsForBezier(A, B, C);
+        (Vector3 T1, Vector3 T2) = GetSmoothPointsForBezier(A, B, C, smoothness);
 
         if (NewTrajectoryStartsBeforePreviousEnds(timeLastStateEndPlusOne, timeTrajectoryStart)) 
         {
@@ -333,7 +336,7 @@ public class TrajectoryManager
             B = B_DTO.Point;
             C = C_DTO.Point;
 
-            (T1, T2) = GetSmoothPointsForBezier(A, B, C);
+            (T1, T2) = GetSmoothPointsForBezier(A, B, C, smoothness);
 
             FlyCubicBezier(
                 A: A,
@@ -370,18 +373,65 @@ public class TrajectoryManager
         );
     }
 
+    private void FlyCircleTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--FlyCircleTrajectoryCommand");
+        DroneState lastState = drones[droneId].getLastAdded();
+        int timeLastStateEndPlusOne = lastState.Time + 1;
+        int timeTrajectoryStart = timestamp;
+
+        Vector3 StartPosition = lastState.Position;
+        Vector3 A = cmdArguments.PointA;
+        Vector3 DestinationPosition = cmdArguments.DestinationPosition;
+        int numberOfRevolutions = cmdArguments.NumberOfRevolutions;
+        bool isClockwise = cmdArguments.IsClockwise;
+
+        List<int> angles;
+        if (isClockwise)
+        {
+            angles = new List<int> {90, 180, 270, 360};
+        } 
+        else 
+        {
+            angles = new List<int> {270, 180, 90, 0};
+        }
+        
+        List<PointDTO> points = new List<PointDTO>();
+        PointDTO startPoint = new PointDTO();
+        startPoint.Point = StartPosition;
+        startPoint.Speed = cmdArguments.Speed;
+        //points.Add(startPoint);
+        for (int i = 0; i < numberOfRevolutions; i++)
+        {
+            foreach (int angle in angles)
+            {
+                PointDTO point = new PointDTO();
+                point.Point = FindPointOnCircle(A, StartPosition, DestinationPosition, angle);
+                point.Speed = cmdArguments.Speed;
+                points.Add(point);
+            }
+        }
+        PointDTO DestinationPoint = new PointDTO();
+        DestinationPoint.Point = DestinationPosition;
+        DestinationPoint.Speed = cmdArguments.Speed;
+        points.Add(DestinationPoint);
+
+        cmdArguments.Points = points;
+        FlyApproxTrajectory(droneId, timestamp, cmdArguments, Vector3.Distance(StartPosition, A) / 2);
+    }
+
     private void DroneModeCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log($"--SetDroneMode: {cmdArguments.DroneMode}");
         drones[droneId].DroneMode = cmdArguments.DroneMode;
     }
 
-    private (Vector3 T1, Vector3 T2) GetSmoothPointsForBezier(Vector3 A, Vector3 B, Vector3 C)
+    private (Vector3 T1, Vector3 T2) GetSmoothPointsForBezier(Vector3 A, Vector3 B, Vector3 C, float smoothness)
     {
         float angleABC = CalculateAngleABC(A, B, C);
         float angleBeta = (180 - angleABC) / 2;
-        Vector3 T1 = CalculatePointA(B, A, C, SMOOTHNESS, angleBeta);
-        Vector3 T2 = CalculatePointA(B, C, A, SMOOTHNESS, angleBeta);
+        Vector3 T1 = CalculatePointA(B, A, C, smoothness, angleBeta);
+        Vector3 T2 = CalculatePointA(B, C, A, smoothness, angleBeta);
         bezierPoints.Add(T1);
         bezierPoints.Add(T2);
         return (T1, T2);
@@ -424,6 +474,29 @@ public class TrajectoryManager
 
         Vector3 A = B + AB;
         return A;
+    }
+
+    public static Vector3 FindPointOnCircle(Vector3 O, Vector3 P, Vector3 D, float alphaDegrees)
+    {
+        // Calculate the normal of the plane defined by P, O, and D
+        Vector3 planeNormal = Vector3.Cross(P - O, D - O).normalized;
+
+        // Calculate the radius vector (OP) and normalize it
+        Vector3 OP = P - O;
+        float radius = OP.magnitude;
+        Vector3 OPNormalized = OP.normalized;
+
+        // Find a vector perpendicular to OP in the plane (perpendicular1)
+        Vector3 perpendicular1 = Vector3.Cross(planeNormal, OPNormalized).normalized;
+
+        // Convert alpha to radians
+        float alphaRadians = Mathf.Deg2Rad * alphaDegrees;
+
+        // Compute the new point P1 using the circle equation
+        Vector3 P1 = O + Mathf.Cos(alphaRadians) * radius * OPNormalized +
+                          Mathf.Sin(alphaRadians) * radius * perpendicular1;
+
+        return P1;
     }
 
 

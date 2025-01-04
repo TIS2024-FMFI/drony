@@ -1,100 +1,100 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/Prefabs/UI/SidePanel.uss?fileID=7433441132597879392&amp;guid=70f9f64710a716b43bba5b2e73a5bbf5&amp;type=3#SidePanel" />
-    <ui:VisualElement name="container" class="container">
-        <ui:VisualElement name="side-panel" class="side-panel">
-            <ui:VisualElement name="header" class="header">
-                <ui:Label text="Simulation Settings" class="panel-title" />
-            </ui:VisualElement>
-            <ui:ScrollView name="content-scroll" mode="Vertical" class="scrollable-content">
+    <engine:VisualElement name="container" class="container">
+        <engine:VisualElement name="side-panel" class="side-panel">
+            <engine:VisualElement name="header" class="header">
+                <engine:Label text="Simulation Settings" class="panel-title" />
+            </engine:VisualElement>
+            <engine:ScrollView name="content-scroll" mode="Vertical" class="scrollable-content">
 
-                <ui:VisualElement class="card">
-                    <ui:VisualElement class="card-header">
-                        <ui:Label text="Drone Command File" class="card-title" />
-                    </ui:VisualElement>
-                    <ui:Button text="Upload Command File" class="upload-button" name="upload-button" />
-                    <ui:Label text="Supported formats: .txt" name="file-name-label" class="support-text" />
-                </ui:VisualElement>
+                <engine:VisualElement class="card">
+                    <engine:VisualElement class="card-header">
+                        <engine:Label text="Drone Command File" class="card-title" />
+                    </engine:VisualElement>
+                    <engine:Button text="Upload Command File" class="upload-button" name="upload-button" />
+                    <engine:Label text="Supported formats: .txt" name="file-name-label" class="support-text" />
+                </engine:VisualElement>
 
-                <ui:VisualElement class="card">
-                    <ui:VisualElement class="card-header">
-                        <ui:Label text="Playback Speed" class="card-title" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="slider-container">
-                        <ui:Label text="Speed: 1x" name="speed-label" class="slider-label" />
-                        <ui:SliderInt name="playback-slider" low-value="0" high-value="6" value="3" class="slider" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
+                <engine:VisualElement class="card">
+                    <engine:VisualElement class="card-header">
+                        <engine:Label text="Playback Speed" class="card-title" />
+                    </engine:VisualElement>
+                    <engine:VisualElement class="slider-container">
+                        <engine:Label text="Speed: 1x" name="speed-label" class="slider-label" />
+                        <engine:SliderInt name="playback-slider" low-value="0" high-value="6" value="3" class="slider" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
 
-                <ui:VisualElement class="card">
-                    <ui:VisualElement class="card-header">
-                        <ui:Label text="Visual Settings" class="card-title" />
-                    </ui:VisualElement>
-                    <ui:Toggle label="Show Audio Visualization" name="show-waveform" class="toggle" />
-                </ui:VisualElement>
+                <engine:VisualElement class="card">
+                    <engine:VisualElement class="card-header">
+                        <engine:Label text="Visual Settings" class="card-title" />
+                    </engine:VisualElement>
+                    <engine:Toggle label="Show Audio Visualization" name="show-waveform" class="toggle" />
+                </engine:VisualElement>
 
-                <ui:VisualElement class="card">
-                    <ui:VisualElement class="card-header">
-                        <ui:Label text="Wall Settings" class="card-title" />
-                    </ui:VisualElement>
-                    <ui:DropdownField name="wall-selector" label="Select Surface" class="dropdown" />
-                    <ui:VisualElement class="input-group">
-                        <ui:Label text="Surface Color" class="input-label" />
-                        <uie:ColorField name="wall-color" class="color-picker" />
-                    </ui:VisualElement>
-                        <ui:Button text="Upload Wall Texture" name="wall-texture-upload" class="upload-button" />
-                            <ui:Label text="No texture loaded" name="wall-texture-label" class="support-text" />
-                </ui:VisualElement>
+                <engine:VisualElement class="card">
+                    <engine:VisualElement class="card-header">
+                        <engine:Label text="Wall Settings" class="card-title" />
+                    </engine:VisualElement>
+                    <engine:DropdownField name="wall-selector" label="Select Surface" class="dropdown" />
+                    <engine:VisualElement class="input-group">
+                        <engine:Label text="Surface Color" class="input-label" />
+                        <!-- <engine:ColorField name="wall-color" class="color-picker" /> -->
+                    </engine:VisualElement>
+                        <engine:Button text="Upload Wall Texture" name="wall-texture-upload" class="upload-button" />
+                            <engine:Label text="No texture loaded" name="wall-texture-label" class="support-text" />
+                </engine:VisualElement>
 
-                <ui:VisualElement class="card">
-                    <ui:VisualElement class="card-header">
-                        <ui:Label text="Drone Settings" class="card-title" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="drone-toggles">
-                        <ui:Toggle label="Drone 1" name="drone1" class="toggle" />
-                        <ui:Toggle label="Drone 2" name="drone2" class="toggle" />
-                        <ui:Toggle label="Drone 3" name="drone3" class="toggle" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="drone-inputs">
-                        <ui:VisualElement class="input-group">
-                            <ui:Label text="Width (cm)" class="input-label" />
-                            <ui:FloatField name="drone-width" class="number-input" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="input-group">
-                            <ui:Label text="Height (cm)" class="input-label" />
-                            <ui:FloatField name="drone-height" class="number-input" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="input-group">
-                            <ui:Label text="Depth (cm)" class="input-label" />
-                            <ui:FloatField name="drone-depth" class="number-input" />
-                        </ui:VisualElement>
-                            <ui:Button text="Upload Drone Model (.sdl)" name="drone-model-upload" class="upload-button" />
-                            <ui:Label text="No model loaded" name="drone-model-label" class="support-text" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
+                <engine:VisualElement class="card">
+                    <engine:VisualElement class="card-header">
+                        <engine:Label text="Drone Settings" class="card-title" />
+                    </engine:VisualElement>
+                    <engine:VisualElement class="drone-toggles">
+                        <engine:Toggle label="Drone 1" name="drone1" class="toggle" />
+                        <engine:Toggle label="Drone 2" name="drone2" class="toggle" />
+                        <engine:Toggle label="Drone 3" name="drone3" class="toggle" />
+                    </engine:VisualElement>
+                    <engine:VisualElement class="drone-inputs">
+                        <engine:VisualElement class="input-group">
+                            <engine:Label text="Width (cm)" class="input-label" />
+                            <engine:FloatField name="drone-width" class="number-input" />
+                        </engine:VisualElement>
+                        <engine:VisualElement class="input-group">
+                            <engine:Label text="Height (cm)" class="input-label" />
+                            <engine:FloatField name="drone-height" class="number-input" />
+                        </engine:VisualElement>
+                        <engine:VisualElement class="input-group">
+                            <engine:Label text="Depth (cm)" class="input-label" />
+                            <engine:FloatField name="drone-depth" class="number-input" />
+                        </engine:VisualElement>
+                            <engine:Button text="Upload Drone Model (.sdl)" name="drone-model-upload" class="upload-button" />
+                            <engine:Label text="No model loaded" name="drone-model-label" class="support-text" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
 
-                <ui:VisualElement class="card">
-                    <ui:VisualElement class="card-header">
-                        <ui:Label text="Simulation Space Size" class="card-title" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="input-group">
-                        <ui:Label text="Width (m)" class="input-label" />
-                        <ui:FloatField name="width-input" class="number-input" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="input-group">
-                        <ui:Label text="Height (m)" class="input-label" />
-                        <ui:FloatField name="height-input" class="number-input" />
-                    </ui:VisualElement>
-                    <ui:VisualElement class="input-group">
-                        <ui:Label text="Depth (m)" class="input-label" />
-                        <ui:FloatField name="depth-input" class="number-input" />
-                    </ui:VisualElement>
-                </ui:VisualElement>
-            </ui:ScrollView>
-            <ui:VisualElement name="footer" class="footer">
-                <ui:Button text="Save Settings" name="save-button" class="save-button" />
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:Button name="toggle-panel-button" class="toggle-panel-button">
-        </ui:Button>
-    </ui:VisualElement>
-</ui:UXML>
+                <engine:VisualElement class="card">
+                    <engine:VisualElement class="card-header">
+                        <engine:Label text="Simulation Space Size" class="card-title" />
+                    </engine:VisualElement>
+                    <engine:VisualElement class="input-group">
+                        <engine:Label text="Width (m)" class="input-label" />
+                        <engine:FloatField name="width-input" class="number-input" />
+                    </engine:VisualElement>
+                    <engine:VisualElement class="input-group">
+                        <engine:Label text="Height (m)" class="input-label" />
+                        <engine:FloatField name="height-input" class="number-input" />
+                    </engine:VisualElement>
+                    <engine:VisualElement class="input-group">
+                        <engine:Label text="Depth (m)" class="input-label" />
+                        <engine:FloatField name="depth-input" class="number-input" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
+            </engine:ScrollView>
+            <engine:VisualElement name="footer" class="footer">
+                <engine:Button text="Save Settings" name="save-button" class="save-button" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:Button name="toggle-panel-button" class="toggle-panel-button">
+        </engine:Button>
+    </engine:VisualElement>
+</engine:UXML>

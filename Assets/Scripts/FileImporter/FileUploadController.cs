@@ -42,7 +42,6 @@ public class FileUploadController : MonoBehaviour
 
     private void OnUploadFile(string title, ExtensionFilter[] extensions, System.Action<string> processFileCallback)
     {
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR
         string[] paths = StandaloneFileBrowser.OpenFilePanel($"Select {title}", "", extensions, false);
 
         if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
@@ -50,19 +49,7 @@ public class FileUploadController : MonoBehaviour
             string filePath = paths[0];
             processFileCallback.Invoke(filePath);
         }
-#endif
     }
-    // Tento komentar sluzi na vysvetlenie myslenky toho, co som (Artemii) tu spravil.
-    // Vymaz ho potom.
-    // Pointa je, ze nespracujem vsetko v jednom FileUploadController. Tato trieda sluzi skor len
-    // na to, aby pristupovat/upravovat/obsluhovat UI komponenty.
-    // Ale samotna logika spracovania akcii sa nachadza v UIManager. 
-    // UIManager uz ma samotne spracovanie poziadaviek/akcii. Tam on ma pristup aj
-    // k inym komponentam programy. 
-    // Ja som to rozdielil len na to, aby sme mali nejaky akokeby "frontend" a "backend",
-    // kde rozne skripty ako ten "FileUploadController" budu 1 vrstvou pri komunikacie z pouzivatelom
-    // a budu manazovat rozne Labely, Buttony, Togglery, atd. Ale Managery ako UIManager, MusicManager,
-    // TrajectoryManager uz budu riesit biznis logiku aplikacie.
     private void ProcessCommandFile(string path)
     {
         uimanager.ProcessCommandFile(path);

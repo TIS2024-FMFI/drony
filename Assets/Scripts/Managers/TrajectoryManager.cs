@@ -40,6 +40,12 @@ public class TrajectoryManager
         trajectoryGenerator = new TrajectoryGenerator();
     }
 
+    public static TrajectoryManager Reinstanciate()
+    {
+        _instance = new TrajectoryManager();
+        return _instance;
+    }
+
     public void LoadTrajectories(List<string> droneCommands)
     {   
         _flightProgramParser = new FlightProgramParser(droneCommands);
@@ -381,8 +387,6 @@ public class TrajectoryManager
     {
         Debug.Log("--FlyCircleTrajectoryCommand");
         DroneState lastState = drones[droneId].getLastAdded();
-        int timeLastStateEndPlusOne = lastState.Time + 1;
-        int timeTrajectoryStart = timestamp;
 
         Vector3 StartPosition = lastState.Position;
         Vector3 A = cmdArguments.PointA;

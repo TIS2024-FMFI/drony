@@ -36,6 +36,10 @@ public class UIManager
 
     public void ProcessCommandFile(string path)
     {
+        DroneSpawner.DestroyAllDrones();
+        trajectoryManager = TrajectoryManager.Reinstanciate();
+
+
         string content = Utilities.ReadTextFile(path);
         CommandFileSplitter commandFileSplitter = new CommandFileSplitter(content);
         List<string> commandSection = commandFileSplitter.GetCommandSection();

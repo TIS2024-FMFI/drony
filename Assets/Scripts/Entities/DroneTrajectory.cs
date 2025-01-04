@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Interpreter;
 
 namespace Drony.Entities
 {
@@ -10,9 +11,11 @@ namespace Drony.Entities
         public List<DroneState> Trajectory { get; set; }
         public List<DroneState> KeyStates {get; set; }
         public int LastStateIndex { get; set; } // index of the last state that was updated
+        public DroneMode DroneMode { get; set; }
 
         public DroneTrajectory() {
             KeyStates = new List<DroneState>();
+            DroneMode = DroneMode.Exact;
         }
 
         public DroneTrajectory(DroneTrajectory other)
@@ -27,6 +30,7 @@ namespace Drony.Entities
             foreach (DroneState droneState in other.KeyStates) {
                 KeyStates.Add(droneState);
             }
+            DroneMode = other.DroneMode;
             
         }
 

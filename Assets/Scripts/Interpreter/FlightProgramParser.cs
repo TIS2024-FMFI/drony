@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
-using System.Windows.Forms;
 using Drony.dto;
-using Unity.VisualScripting.ReorderableList.Element_Adder_Menu;
 using UnityEngine;
 
 namespace Interpreter
@@ -145,6 +143,7 @@ namespace Interpreter
                 Command.FlyTo => ParseLinearTrajectoryArgs(argumentsList),
                 Command.FlyTrajectory => ParseTrajectoryArgs(argumentsList),
                 Command.FlySpiral => ParseSpiralTrajectoryArgs(argumentsList),
+                Command.DroneMode => ParseDroneModeArgs(argumentsList),
                 _ => new CmdArgumentsDTO()
             };
             
@@ -232,6 +231,24 @@ namespace Interpreter
             cmdArgumentsDTO.IsClockwise = clockwise == 1;
             cmdArgumentsDTO.NumberOfRevolutions = numberOfRevolutions;
             cmdArgumentsDTO.Speed = speed;
+
+            return cmdArgumentsDTO;
+        }
+        private CmdArgumentsDTO ParseDroneModeArgs(List<string> args)
+        {
+            DroneMode command = args[0] switch
+            {
+                "exact" => DroneMode.Exact,
+                "exactly" => DroneMode.Exact,
+                "e" => DroneMode.Exact,
+                "approx" => DroneMode.Approx,
+                "approximately" => DroneMode.Approx,
+                "a" => DroneMode.Approx,
+                _ => DroneMode.Error
+            };
+
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.DroneMode = command;
 
             return cmdArgumentsDTO;
         }

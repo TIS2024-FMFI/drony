@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Interpreter;
 
 namespace Drony.dto 
 {
@@ -21,6 +22,7 @@ namespace Drony.dto
         public int NumberOfRevolutions { get; set; }
         public string Name { get; set; }
         public string Value { get; set; }
+        public DroneMode DroneMode { get; set; }
 
         
     }

@@ -66,6 +66,9 @@ public class TrajectoryManager
                 case Command.FlyTo:
                     FlyToCommand(droneId, timestampMilliseconds, cmdArguments);
                     break;
+                case Command.DroneMode:
+                    DroneModeCommand(droneId, timestampMilliseconds, cmdArguments);
+                    break;
                 case Command.FlyTrajectory:
                     FlyTrajectoryCommand(droneId, timestampMilliseconds, cmdArguments);
                     break;
@@ -195,10 +198,51 @@ public class TrajectoryManager
         drones[droneId] = trajectoryGenerator.GenerateCubicBezierTrajectory(drones[droneId], timestamp, cmdArgumentsForBezier);
     }
 
-
     private void FlyTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--FlyTrajectoryCommand");
+        if (drones[droneId].DroneMode == DroneMode.Exact) 
+        {
+            FlyExactTrajectory(droneId, timestamp, cmdArguments);
+        } 
+        else if (drones[droneId].DroneMode == DroneMode.Approx)
+        {
+            FlyApproxTrajectory(droneId, timestamp, cmdArguments);
+        }
+    }
+    private void FlyExactTrajectory(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--FlyExactTrajectoryCommand");
+        DroneState lastState = drones[droneId].getLastAdded();
+        int timeLastStateEndPlusOne = lastState.Time + 1;
+        int timeTrajectoryStart = timestamp;
+
+        List<PointDTO> points = cmdArguments.Points;
+        if (points == null || points.Count == 0) {
+            throw new InvalidOperationException("Trajectory is empty");
+        }
+
+        while (true)
+        {
+            if (points.Count == 0)
+            {
+                break;
+            }
+            PointDTO pointDTO = points[0];
+            points.RemoveRange(0, 1);
+            cmdArguments.DestinationPosition = pointDTO.Point;
+            cmdArguments.DestinationYaw = pointDTO.DestinationYaw;
+            cmdArguments.Speed = pointDTO.Speed;
+            FlyToCommand(droneId, timeTrajectoryStart, cmdArguments);
+
+            timeTrajectoryStart = drones[droneId].getLastAdded().Time + 1; 
+        }
+
+
+    }
+
+    private void FlyApproxTrajectory(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--FlyApproxTrajectoryCommand");
         DroneState lastState = drones[droneId].getLastAdded();
         int timeLastStateEndPlusOne = lastState.Time + 1;
         int timeTrajectoryStart = timestamp;
@@ -326,13 +370,18 @@ public class TrajectoryManager
         );
     }
 
+    private void DroneModeCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log($"--SetDroneMode: {cmdArguments.DroneMode}");
+        drones[droneId].DroneMode = cmdArguments.DroneMode;
+    }
+
     private (Vector3 T1, Vector3 T2) GetSmoothPointsForBezier(Vector3 A, Vector3 B, Vector3 C)
     {
         float angleABC = CalculateAngleABC(A, B, C);
         float angleBeta = (180 - angleABC) / 2;
         Vector3 T1 = CalculatePointA(B, A, C, SMOOTHNESS, angleBeta);
         Vector3 T2 = CalculatePointA(B, C, A, SMOOTHNESS, angleBeta);
-        //Debug.Log($"T1: {T1}, T2: {T2}");
         bezierPoints.Add(T1);
         bezierPoints.Add(T2);
         return (T1, T2);
@@ -359,27 +408,20 @@ public class TrajectoryManager
 
     private Vector3 CalculatePointA(Vector3 B, Vector3 C, Vector3 D, float ABLength, float angleABC)
     {
-        // Вектор BC
         Vector3 BC = C - B;
         Vector3 BD = D - B;
 
-        // Нормаль к плоскости BCD
         Vector3 normal = Vector3.Cross(BD, BC).normalized;
 
-        // Единичный вектор вдоль BC
         Vector3 unitBC = BC.normalized;
 
-        // Вектор в плоскости, перпендикулярный BC
         Vector3 perpendicular = Vector3.Cross(normal, unitBC).normalized;
 
-        // Разложение AB по BC и перпендикулярному вектору
-        float u = ABLength * Mathf.Cos(angleABC * Mathf.Deg2Rad); // Компонента вдоль BC
-        float v = ABLength * Mathf.Sin(angleABC * Mathf.Deg2Rad); // Компонента перпендикулярная BC
+        float u = ABLength * Mathf.Cos(angleABC * Mathf.Deg2Rad);
+        float v = ABLength * Mathf.Sin(angleABC * Mathf.Deg2Rad);
 
-        // Вектор AB
         Vector3 AB = u * unitBC + v * perpendicular;
 
-        // Координаты точки A
         Vector3 A = B + AB;
         return A;
     }

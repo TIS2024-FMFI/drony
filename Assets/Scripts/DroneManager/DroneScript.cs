@@ -51,51 +51,50 @@ public class DroneScript : MonoBehaviour
     void FixedUpdate() // 100fps should be
     {
         DroneState currentState = trajectoryManager.GetCurrentDroneState(id);
+        currentTime = trajectoryManager.GetCurrentTime();
         transform.position = currentState.Position;
         transform.rotation = currentState.YawAngle;
         currentTime = currentState.Time;
-        AddMarker(transform.position);
-    }
-
-    private void AddMarker(Vector3 position)
-    {
-        markerPositions.Add(new GizmosState(position, color, "", style));
+        markerPositions.Add(new GizmosState(transform.position, color, "", currentTime, style));
     }
 
     private void OnDrawGizmos()
     {
-        foreach (DroneState droneState in trajectoryManager.GetKeyStates(id)) 
-        {
-            if (currentTime < droneState.Time) {
-                break;
-            }
-            Vector3 position = droneState.Position;
-            string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
-            // Handles.Label(position, text, style);
-            Gizmos.DrawSphere(position, 0.1f);
-        }
-        foreach(Vector3 position in trajectoryManager.GetBezierPoints())
-        {
-            string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
-            GUIStyle styleBezier = new GUIStyle(style);
-            styleBezier.normal.textColor = Color.red;
-            // Handles.Label(position, text, styleBezier);
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(position, 0.05f);
+        // foreach (DroneState droneState in trajectoryManager.GetKeyStates(id)) 
+        // {
+        //     if (currentTime < droneState.Time) {
+        //         break;
+        //     }
+        //     Vector3 position = droneState.Position;
+        //     string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
+        //     // Handles.Label(position, text, style);
+        //     Gizmos.DrawSphere(position, 0.1f);
+        // }
+        // foreach(Vector3 position in trajectoryManager.GetBezierPoints())
+        // {
+        //     string text = $"({position.x:F2}, {position.y:F2}, {position.z:F2})";
+        //     GUIStyle styleBezier = new GUIStyle(style);
+        //     styleBezier.normal.textColor = Color.red;
+        //     // Handles.Label(position, text, styleBezier);
+        //     Gizmos.color = Color.red;
+        //     Gizmos.DrawSphere(position, 0.05f);
 
-            if (!previousBezierPointSet)
-            {
-                previousBezierPoint = position;
-                previousBezierPointSet = true;
-            } 
-            else 
-            {
-                Gizmos.DrawLine(previousBezierPoint, position);
-                previousBezierPointSet = false;
-            }
-        }
+        //     if (!previousBezierPointSet)
+        //     {
+        //         previousBezierPoint = position;
+        //         previousBezierPointSet = true;
+        //     } 
+        //     else 
+        //     {
+        //         Gizmos.DrawLine(previousBezierPoint, position);
+        //         previousBezierPointSet = false;
+        //     }
+        // }
         foreach (GizmosState marker in markerPositions)
         {
+            if (currentTime < marker.Time) {
+                break;
+            }
             Gizmos.color = marker.Color;
             Gizmos.DrawSphere(marker.Position, 0.05f); // Draw small red spheres
         }

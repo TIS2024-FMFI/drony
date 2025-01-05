@@ -10,7 +10,7 @@ using Drony.dto;
 /// Singleton class <c>TrajectoryManager</c> manages logic for parser and generator 
 /// to create trajectories for each drone.
 /// </summary>
-public class TrajectoryManager 
+public class TrajectoryManager
 {
     private Dictionary<string, DroneTrajectory> drones;
     private int currentTime = 0;
@@ -47,13 +47,13 @@ public class TrajectoryManager
     {   
         _flightProgramParser = new FlightProgramParser(droneCommands);
 
-
         while (true) {
             (TimeSpan timestamp, string droneId, Command cmd, CmdArgumentsDTO cmdArguments) = _flightProgramParser.NextCommand();
 
             if (droneId == "") {
                 break;
-            } if (!drones.ContainsKey(droneId)) {
+            } 
+            if (!drones.ContainsKey(droneId)) {
                 drones[droneId] = trajectoryGenerator.initDroneTrajectory(droneId);
             }
             DroneTrajectory droneTrajectory = drones[droneId]; 
@@ -400,11 +400,6 @@ public class TrajectoryManager
         cmdArguments.Points = points;
         FlyApproxTrajectory(droneId, timestamp, cmdArguments,  Vector3.Distance(StartPosition, MathOperations.FindPerpendicularPoint(A, B, StartPosition)) / 2);
     }
-    private void HoverCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
-    {
-        Debug.Log("--HoverCommand");
-        throw new NotImplementedException("HoverCommand is not implemented yet.");
-    }
     private void FlySinusTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log("--FlySinusTrajectoryCommand");
@@ -414,6 +409,11 @@ public class TrajectoryManager
     {
         Debug.Log("--FlyParabolaTrajectoryCommand");
         throw new NotImplementedException("FlyParabolaTrajectoryCommand is not implemented yet.");
+    }
+    private void HoverCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--HoverCommand");
+        throw new NotImplementedException("HoverCommand is not implemented yet.");
     }
     private void SetColorCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {

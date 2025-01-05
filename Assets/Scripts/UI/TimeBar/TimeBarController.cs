@@ -92,6 +92,7 @@ public class TimeBarController : MonoBehaviour
     public void SetTimeMultiplier(float multiplier)
     {
         timeMultiplier = multiplier;
+        uimanager.SetPlaybackSpeed(timeMultiplier);
     }
 
     private string FormatTime(float timeInMilliseconds)

@@ -19,7 +19,7 @@ public class TrajectoryManager
     private int TAKEOFF_SPEED = 1; // FIXME: add an option to set it in config file or in ui
     private float SMOOTHNESS = 0.5f; // in m
     public int totalTime = 0;
-    private int PlaybackSpeed = 1;
+    private float PlaybackSpeed = 1;
     private List<Vector3> bezierPoints = new List<Vector3>();
     private static TrajectoryManager _instance;
     public static TrajectoryManager Instance
@@ -670,7 +670,7 @@ public class TrajectoryManager
             totalTime = droneLastTime;
         }
     }
-    public void SetPlaybackSpeed(int playbackSpeed)
+    public void SetPlaybackSpeed(float playbackSpeed)
     {
         PlaybackSpeed = playbackSpeed;
     }

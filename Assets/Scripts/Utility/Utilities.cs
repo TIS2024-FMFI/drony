@@ -13,9 +13,9 @@ namespace Utility
         private static int MILLIS_IN_SEC = 1000;
         private static int FRAME_RATE = 100;
         private static int MILLIMETERS_IN_ONE_METER = 1000;
-        public static int ConvertFromPlaybackSpeedToMillisGap(int playbackSpeed) 
+        public static int ConvertFromPlaybackSpeedToMillisGap(float playbackSpeed) 
         {
-            return playbackSpeed * (MILLIS_IN_SEC / FRAME_RATE);
+            return (int) (playbackSpeed * (MILLIS_IN_SEC / FRAME_RATE));
         }
         public static int ConvertFromMetersToMillimeters(float meter) 
         {

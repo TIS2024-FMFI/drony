@@ -85,7 +85,7 @@ public class UIManager
     {
         trajectoryManager.SetCurrentTime(time);
     }
-    public void SetPlaybackSpeed(int playbackSpeed)
+    public void SetPlaybackSpeed(float playbackSpeed)
     {
         trajectoryManager.SetPlaybackSpeed(playbackSpeed);
     }

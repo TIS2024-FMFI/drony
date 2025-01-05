@@ -19,7 +19,7 @@ namespace Utility
         }
         public static int ConvertFromMetersToMillimeters(float meter) 
         {
-            return (int) meter * MILLIMETERS_IN_ONE_METER;
+            return (int) (meter * MILLIMETERS_IN_ONE_METER);
         }
         public static float ConvertFromMillisecondsToSeconds(int ms)
         {

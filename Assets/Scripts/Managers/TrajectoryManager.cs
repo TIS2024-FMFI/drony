@@ -111,33 +111,30 @@ public class TrajectoryManager
     private void TakeOffCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log("--TakeOffCommand");
-        int height = cmdArguments.DestinationHeight;
 
         DroneState lastState = drones[droneId].getLastAdded();
         Vector3 lastPosition = lastState.Position;
         int timeLastStateEndPlusOne = lastState.Time + 1;
-        int timeLinearTrajectoryStart = timestamp;
+        int timeTakeOffTrajectoryStart = timestamp;
 
+        GenerateHoverTrajectoryIfNeeded(
+            droneId: droneId, 
+            lastState: lastState, 
+            timeLastStateEndPlusOne: timeLastStateEndPlusOne,
+            timeNewTrajectoryStart: timeTakeOffTrajectoryStart);
+
+        int height = cmdArguments.DestinationHeight;
         Vector3 destinationPosition = new Vector3(lastPosition.x, lastPosition.y + height, lastPosition.z);
 
-        CmdArgumentsDTO cmdArgumentsForLinear = new CmdArgumentsDTO(); 
-        cmdArgumentsForLinear.StartPosition = lastPosition;
-        cmdArgumentsForLinear.StartYaw = lastState.YawAngle;
-        cmdArgumentsForLinear.DestinationPosition = destinationPosition;
-        cmdArgumentsForLinear.DestinationYaw = lastState.YawAngle;
-        cmdArgumentsForLinear.Speed = TAKEOFF_SPEED;
-        
-        if (timeLastStateEndPlusOne < timeLinearTrajectoryStart) 
-        {
-            drones[droneId] = trajectoryGenerator.GenerateHoverTrajectory(
-                                new DroneTrajectory(drones[droneId]), 
-                                timeLastStateEndPlusOne, 
-                                timeLinearTrajectoryStart, 
-                                lastState
-                            );
-        }
-
-        drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(drones[droneId], timestamp, cmdArgumentsForLinear);
+        drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(
+            droneTrajectory: drones[droneId], 
+            timestamp: timestamp, 
+            startPosition: lastPosition,
+            destinationPosition: destinationPosition,
+            startRotation: lastState.YawAngle,
+            targetRotation: lastState.YawAngle,
+            speed: TAKEOFF_SPEED
+        );
     }
     private void FlyToCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
@@ -149,84 +146,49 @@ public class TrajectoryManager
         if (NewTrajectoryStartsBeforePreviousEnds(timeLastStateEndPlusOne, timeLinearTrajectoryStart)) 
         {
             DroneState bezierTrajectoryStartState = drones[droneId][timeLinearTrajectoryStart];
-            FlyQuadraticBezier(
-                A: bezierTrajectoryStartState.Position,
-                B: lastState.Position,
-                C: cmdArguments.DestinationPosition,
-                droneId: droneId,
-                timestamp: timestamp,
-                speed: cmdArguments.Speed,
-                startYaw: bezierTrajectoryStartState.YawAngle,
-                destinationYaw: cmdArguments.DestinationYaw
+            drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(
+                droneTrajectory: drones[droneId], 
+                timestamp: timestamp, 
+                pointA: bezierTrajectoryStartState.Position,
+                pointB: lastState.Position,
+                pointC: cmdArguments.DestinationPosition,
+                startRotation: bezierTrajectoryStartState.YawAngle,
+                targetRotation: cmdArguments.DestinationYaw,
+                speed: cmdArguments.Speed
             );
             return;
         }
-        if (ThereIsANeedToHoverAndWait(timeLastStateEndPlusOne, timeLinearTrajectoryStart)) 
-        {
-            drones[droneId] = trajectoryGenerator.GenerateHoverTrajectory(
-                                new DroneTrajectory(drones[droneId]), 
-                                timeLastStateEndPlusOne, 
-                                timeLinearTrajectoryStart, 
-                                lastState
-                            );
-        }
+        GenerateHoverTrajectoryIfNeeded(
+            droneId: droneId, 
+            lastState: lastState, 
+            timeLastStateEndPlusOne: timeLastStateEndPlusOne,
+            timeNewTrajectoryStart: timeLinearTrajectoryStart
+        );
         
-        cmdArguments.StartPosition = lastState.Position;
-        cmdArguments.StartYaw = lastState.YawAngle;
-        drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(drones[droneId], timestamp, cmdArguments);
+        drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(
+            droneTrajectory: drones[droneId], 
+            timestamp: timestamp, 
+            startPosition: lastState.Position,
+            destinationPosition: cmdArguments.DestinationPosition,
+            startRotation: lastState.YawAngle,
+            targetRotation: cmdArguments.DestinationYaw,
+            speed: cmdArguments.Speed
+        );
     
     }
-
-    private bool NewTrajectoryStartsBeforePreviousEnds(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
+    private void HoverCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        return timeLastStateEndPlusOne > timeLinearTrajectoryStart;
-    }
-
-    private bool ThereIsANeedToHoverAndWait(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
-    {
-        return timeLastStateEndPlusOne < timeLinearTrajectoryStart;
-    }
-
-    private bool NewTrajectoryStartsRightAfterPreviousEnds(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
-    {
-        return timeLastStateEndPlusOne == timeLinearTrajectoryStart;
-    }
-    
-
-    private void FlyQuadraticBezier(string droneId, int timestamp, Vector3 A, Vector3 B, Vector3 C, int speed, Quaternion startYaw, Quaternion destinationYaw)
-    {
-        CmdArgumentsDTO cmdArgumentsForBezier = new CmdArgumentsDTO(); 
-        cmdArgumentsForBezier.PointA = A;
-        cmdArgumentsForBezier.PointB = B;
-        cmdArgumentsForBezier.PointC = C;
-        cmdArgumentsForBezier.Speed = speed;
-        cmdArgumentsForBezier.StartYaw = startYaw;
-        cmdArgumentsForBezier.DestinationYaw = destinationYaw;
-
-        drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(drones[droneId], timestamp, cmdArgumentsForBezier);
-    }
-
-    private void FlyCubicBezier(string droneId, int timestamp, Vector3 A, Vector3 B, Vector3 C, Vector3 D, int speed, Quaternion startYaw, Quaternion destinationYaw)
-    {
-        CmdArgumentsDTO cmdArgumentsForBezier = new CmdArgumentsDTO(); 
-        cmdArgumentsForBezier.PointA = A;
-        cmdArgumentsForBezier.PointB = B;
-        cmdArgumentsForBezier.PointC = C;
-        cmdArgumentsForBezier.PointD = D;
-        cmdArgumentsForBezier.Speed = speed;
-        cmdArgumentsForBezier.StartYaw = startYaw;
-        cmdArgumentsForBezier.DestinationYaw = destinationYaw;
-
-        drones[droneId] = trajectoryGenerator.GenerateCubicBezierTrajectory(drones[droneId], timestamp, cmdArgumentsForBezier);
+        Debug.Log("--HoverCommand");
+        throw new NotImplementedException("HoverCommand is not implemented yet.");
     }
 
     private void FlyTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        if (drones[droneId].DroneMode == DroneMode.Exact) 
+        if (DroneModeIsExact(droneId)) 
         {
             FlyExactTrajectory(droneId, timestamp, cmdArguments);
         } 
-        else if (drones[droneId].DroneMode == DroneMode.Approx)
+        else if (DroneModeIsApprox(droneId))
         {
             FlyApproxTrajectory(droneId, timestamp, cmdArguments, SMOOTHNESS);
         }
@@ -239,16 +201,13 @@ public class TrajectoryManager
         int timeTrajectoryStart = timestamp;
 
         List<PointDTO> points = cmdArguments.Points;
-        if (points == null || points.Count == 0) {
-            throw new InvalidOperationException("Trajectory is empty");
+        if (points == null || points.Count == 0) 
+        {
+            throw new InvalidOperationException("Trajectory is empty, but would be much more better if there was an UI which will show this exception to the user");
         }
 
-        while (true)
+        while (points.Count != 0)
         {
-            if (points.Count == 0)
-            {
-                break;
-            }
             PointDTO pointDTO = points[0];
             points.RemoveRange(0, 1);
             cmdArguments.DestinationPosition = pointDTO.Point;
@@ -267,16 +226,12 @@ public class TrajectoryManager
         int timeLastStateEndPlusOne = lastState.Time + 1;
         int timeTrajectoryStart = timestamp;
 
-        if (ThereIsANeedToHoverAndWait(timeLastStateEndPlusOne, timeTrajectoryStart)) 
-        {
-            drones[droneId] = trajectoryGenerator.GenerateHoverTrajectory(
-                                new DroneTrajectory(drones[droneId]), 
-                                timeLastStateEndPlusOne, 
-                                timeTrajectoryStart, 
-                                lastState
-                            );
-        }
-
+        GenerateHoverTrajectoryIfNeeded(
+            droneId: droneId, 
+            lastState: lastState, 
+            timeLastStateEndPlusOne: timeLastStateEndPlusOne,
+            timeNewTrajectoryStart: timeTrajectoryStart
+        );
 
         List<PointDTO> points = cmdArguments.Points;
         if (points == null || points.Count == 0) {
@@ -311,27 +266,27 @@ public class TrajectoryManager
         if (NewTrajectoryStartsBeforePreviousEnds(timeLastStateEndPlusOne, timeTrajectoryStart)) 
         {
             DroneState bezierTrajectoryStartState = drones[droneId][timeTrajectoryStart];
-            FlyCubicBezier(
-                A: bezierTrajectoryStartState.Position,
-                B: A,
-                C: T1,
-                D: B,
-                droneId: droneId,
-                timestamp: timeTrajectoryStart,
-                speed: B_DTO.Speed,
-                startYaw: bezierTrajectoryStartState.YawAngle,
-                destinationYaw: B_DTO.DestinationYaw
+            drones[droneId] = trajectoryGenerator.GenerateCubicBezierTrajectory(
+                droneTrajectory: drones[droneId], 
+                timestamp: timeTrajectoryStart, 
+                pointA: bezierTrajectoryStartState.Position,
+                pointB: A,
+                pointC: T1,
+                pointD: B,
+                startRotation: bezierTrajectoryStartState.YawAngle,
+                targetRotation: B_DTO.DestinationYaw,
+                speed: B_DTO.Speed
             );
         } else {
-            FlyQuadraticBezier(
-                A: A,
-                B: T1,
-                C: B,
-                droneId: droneId,
-                timestamp: timeTrajectoryStart,
-                speed: B_DTO.Speed,
-                startYaw: lastState.YawAngle,
-                destinationYaw: B_DTO.DestinationYaw
+            drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(
+                droneTrajectory: drones[droneId], 
+                timestamp: timeTrajectoryStart, 
+                pointA: A,
+                pointB: T1,
+                pointC: B,
+                startRotation: lastState.YawAngle,
+                targetRotation: B_DTO.DestinationYaw,
+                speed: B_DTO.Speed
             );
         }
 
@@ -342,12 +297,8 @@ public class TrajectoryManager
         A_DTO.copy(B_DTO);
         B_DTO.copy(C_DTO);
 
-        while (true)
+        while (points.Count != 0)
         {
-            if (points.Count == 0)
-            {
-                break;
-            }
             C_DTO = points[0];
             points.RemoveRange(0, 1);
 
@@ -359,16 +310,16 @@ public class TrajectoryManager
             bezierPoints.Add(T1);
             bezierPoints.Add(T2);
 
-            FlyCubicBezier(
-                A: A,
-                B: S1,
-                C: T1,
-                D: B,
-                droneId: droneId,
-                timestamp: timeLastStateEndPlusOne,
-                speed: B_DTO.Speed,
-                startYaw: A_DTO.DestinationYaw,
-                destinationYaw: B_DTO.DestinationYaw
+            drones[droneId] = trajectoryGenerator.GenerateCubicBezierTrajectory(
+                droneTrajectory: drones[droneId], 
+                timestamp: timeLastStateEndPlusOne, 
+                pointA: A,
+                pointB: S1,
+                pointC: T1,
+                pointD: B,
+                startRotation: A_DTO.DestinationYaw,
+                targetRotation: B_DTO.DestinationYaw,
+                speed: B_DTO.Speed
             );
 
             timeLastStateEndPlusOne = drones[droneId].getLastAdded().Time + 1;
@@ -382,15 +333,15 @@ public class TrajectoryManager
         A = A_DTO.Point;
         B = B_DTO.Point;
 
-        FlyQuadraticBezier(
-            A: A,
-            B: S1,
-            C: B,
-            droneId: droneId,
-            timestamp: timeLastStateEndPlusOne,
-            speed: B_DTO.Speed,
-            startYaw: A_DTO.DestinationYaw,
-            destinationYaw: B_DTO.DestinationYaw
+        drones[droneId] = trajectoryGenerator.GenerateQuadraticBezierTrajectory(
+            droneTrajectory: drones[droneId], 
+            timestamp: timeLastStateEndPlusOne, 
+            pointA: A,
+            pointB: S1,
+            pointC: B,
+            startRotation: A_DTO.DestinationYaw,
+            targetRotation: B_DTO.DestinationYaw,
+            speed: B_DTO.Speed
         );
     }
 
@@ -519,6 +470,42 @@ public class TrajectoryManager
     public void ResetCurrentTime()
     {
         currentTime = 0;
+    }
+
+    private void GenerateHoverTrajectoryIfNeeded(string droneId, DroneState lastState, int timeLastStateEndPlusOne, int timeNewTrajectoryStart)
+    {
+        if (ThereIsANeedToHoverAndWait(timeLastStateEndPlusOne, timeNewTrajectoryStart)) 
+        {
+            drones[droneId] = trajectoryGenerator.GenerateHoverTrajectory(
+                                new DroneTrajectory(drones[droneId]), 
+                                timeLastStateEndPlusOne, 
+                                timeNewTrajectoryStart, 
+                                lastState
+                            );
+        }
+    }
+
+    private bool NewTrajectoryStartsBeforePreviousEnds(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
+    {
+        return timeLastStateEndPlusOne > timeLinearTrajectoryStart;
+    }
+
+    private bool ThereIsANeedToHoverAndWait(int timeLastStateEndPlusOne, int timeTrajectoryStart)
+    {
+        return timeLastStateEndPlusOne < timeTrajectoryStart;
+    }
+
+    private bool NewTrajectoryStartsRightAfterPreviousEnds(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
+    {
+        return timeLastStateEndPlusOne == timeLinearTrajectoryStart;
+    }
+    private bool DroneModeIsExact(string droneId)
+    {
+        return drones[droneId].DroneMode == DroneMode.Exact;
+    }
+    private bool DroneModeIsApprox(string droneId)
+    {
+        return drones[droneId].DroneMode == DroneMode.Approx;
     }
 
 }

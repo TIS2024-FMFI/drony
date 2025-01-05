@@ -31,7 +31,6 @@ namespace Utility
 
             return angleDegrees;
         }
-
         public static Vector3 CalculatePointA(Vector3 B, Vector3 C, Vector3 D, float ABLength, float angleABC)
         {
             Vector3 BC = C - B;
@@ -51,7 +50,6 @@ namespace Utility
             Vector3 A = B + AB;
             return A;
         }
-
         public static List<Vector3> FindPointsForSpiral(Vector3 A, Vector3 B, Vector3 S, Vector3 D, int numberOfRevolutions, bool isClockwise)
         {
             if (numberOfRevolutions <= 0)
@@ -77,7 +75,6 @@ namespace Utility
             }
             return points;
         }
-
         /// <summary>
         /// Finds the perpendicular projection of point S onto the line AB.
         /// </summary>
@@ -92,7 +89,6 @@ namespace Utility
             float t = Vector3.Dot(AS, AB) / Vector3.Dot(AB, AB);
             return A + t * AB; // Point on AB
         }
-
         /// <summary>
         /// Finds a point P1' on a vector parallel to AB, at a distance Dx from P1.
         /// </summary>
@@ -108,8 +104,7 @@ namespace Utility
 
             // Point P1' in the specified direction and distance Dx
             return P1 + unitDirection * Dx;
-        }
-        
+        }     
         public static Vector3 FindPerpendicularRandomPoint(Vector3 A, Vector3 B, Vector3 O)
         {
             // Step 1: Calculate the normal vector of the plane (AB direction)
@@ -138,7 +133,6 @@ namespace Utility
             // Step 5: Return the random point
             return new Vector3(randomX, randomY, z);
         }
-
         public static Vector3 FindPointOnCircle(Vector3 O, Vector3 P, Vector3 D, float alphaDegrees)
         {
             // Calculate the normal of the plane defined by P, O, and D
@@ -161,7 +155,6 @@ namespace Utility
 
             return P1;
         }
-
         public static Vector3 FindPointOnCircleByAB(Vector3 O, Vector3 P, Vector3 A, Vector3 B, float alphaDegrees)
         {
             // Calculate the normal of the plane defined by A and B (AB direction)
@@ -183,6 +176,75 @@ namespace Utility
                             Mathf.Sin(alphaRadians) * radius * perpendicular1;
 
             return P1;
+        }
+        public static Vector3 GetQuadraticBezierPositionByTime(float Time, Vector3 A, Vector3 B, Vector3 C) 
+        {
+            Time = Mathf.Clamp01(Time);
+            float invTime = 1 - Time;
+            return (invTime * invTime * A)
+                + (2 * invTime * Time * B)
+                + (Time * Time * C);
+        }
+        public static Vector3 GetCubicBezierPositionByTime(float Time, Vector3 A, Vector3 B, Vector3 C, Vector3 D) 
+        {
+            Time = Mathf.Clamp01(Time);
+            float invTime = 1 - Time;
+            return (invTime * invTime * invTime * A)
+                + (3 * invTime * invTime * Time * B)
+                + (3 * invTime * Time * Time * C)
+                + (Time * Time * Time * D);
+        }
+        public static float CalculateQuadraticBezierCurveLength(Vector3 A, Vector3 B, Vector3 C, int subdivisions = 100)
+        {
+            float totalLength = 0f;
+
+            // Previous point on the curve
+            Vector3 previousPoint = A;
+
+            // Step size
+            float step = 1f / subdivisions;
+
+            for (int i = 1; i <= subdivisions; i++)
+            {
+                float t = i * step;
+
+                // Calculate the current point on the curve
+                Vector3 currentPoint = GetQuadraticBezierPositionByTime(t, A, B, C);
+
+                // Add the distance between the previous point and the current point
+                totalLength += Vector3.Distance(previousPoint, currentPoint);
+
+                // Update the previous point
+                previousPoint = currentPoint;
+            }
+
+            return totalLength;
+        }
+        public static float CalculateCubicBezierCurveLength(Vector3 A, Vector3 B, Vector3 C, Vector3 D, int subdivisions = 100)
+        {
+            float totalLength = 0f;
+
+            // Previous point on the curve
+            Vector3 previousPoint = A;
+
+            // Step size
+            float step = 1f / subdivisions;
+
+            for (int i = 1; i <= subdivisions; i++)
+            {
+                float t = i * step;
+
+                // Calculate the current point on the curve
+                Vector3 currentPoint = GetCubicBezierPositionByTime(t, A, B, C, D);
+
+                // Add the distance between the previous point and the current point
+                totalLength += Vector3.Distance(previousPoint, currentPoint);
+
+                // Update the previous point
+                previousPoint = currentPoint;
+            }
+
+            return totalLength;
         }
     }
 }

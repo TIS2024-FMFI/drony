@@ -33,19 +33,16 @@ public class TrajectoryManager
             return _instance;
         }
     }
-
     private TrajectoryManager()
     {
         drones = new Dictionary<string, DroneTrajectory>();
         trajectoryGenerator = new TrajectoryGenerator();
     }
-
     public static TrajectoryManager Reinstanciate()
     {
         _instance = new TrajectoryManager();
         return _instance;
     }
-
     public void LoadTrajectories(List<string> droneCommands)
     {   
         _flightProgramParser = new FlightProgramParser(droneCommands);
@@ -101,12 +98,6 @@ public class TrajectoryManager
                         drones[droneId],
                         timestamp,
                         cmdArguments);
-    }
-    private void SetColorCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
-    {
-        Debug.Log("--SetColorCommand");
-        throw new NotImplementedException("SetColorCommand is not implemented yet.");
-        
     }
     private void TakeOffCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
@@ -176,12 +167,6 @@ public class TrajectoryManager
         );
     
     }
-    private void HoverCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
-    {
-        Debug.Log("--HoverCommand");
-        throw new NotImplementedException("HoverCommand is not implemented yet.");
-    }
-
     private void FlyTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         if (DroneModeIsExact(droneId)) 
@@ -218,7 +203,6 @@ public class TrajectoryManager
             timeTrajectoryStart = drones[droneId].getLastAdded().Time + 1; 
         }
     }
-
     private void FlyApproxTrajectory(string droneId, int timestamp, CmdArgumentsDTO cmdArguments, float smoothness)
     {
         Debug.Log("--FlyApproxTrajectoryCommand");
@@ -344,7 +328,6 @@ public class TrajectoryManager
             speed: B_DTO.Speed
         );
     }
-
     private void FlyCircleTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log("--FlyCircleTrajectoryCommand");
@@ -389,7 +372,6 @@ public class TrajectoryManager
         cmdArguments.Points = points;
         FlyApproxTrajectory(droneId, timestamp, cmdArguments, Vector3.Distance(StartPosition, O) / 2);
     }
-
     private void FlySpiralTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log("--FlySpiralTrajectoryCommand");
@@ -418,13 +400,32 @@ public class TrajectoryManager
         cmdArguments.Points = points;
         FlyApproxTrajectory(droneId, timestamp, cmdArguments,  Vector3.Distance(StartPosition, MathOperations.FindPerpendicularPoint(A, B, StartPosition)) / 2);
     }
-
+    private void HoverCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--HoverCommand");
+        throw new NotImplementedException("HoverCommand is not implemented yet.");
+    }
+    private void FlySinusTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--FlySinusTrajectoryCommand");
+        throw new NotImplementedException("FlySinusTrajectoryCommand is not implemented yet.");
+    }
+    private void FlyParabolaTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--FlyParabolaTrajectoryCommand");
+        throw new NotImplementedException("FlyParabolaTrajectoryCommand is not implemented yet.");
+    }
+    private void SetColorCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--SetColorCommand");
+        throw new NotImplementedException("SetColorCommand is not implemented yet.");
+        
+    }
     private void DroneModeCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log($"--SetDroneMode: {cmdArguments.DroneMode}");
         drones[droneId].DroneMode = cmdArguments.DroneMode;
     }
-
     public DroneState GetCurrentDroneState(string droneId) {
             DroneState currentDroneState = drones[droneId].getNext(currentTime);
             return currentDroneState;
@@ -471,7 +472,6 @@ public class TrajectoryManager
     {
         currentTime = 0;
     }
-
     private void GenerateHoverTrajectoryIfNeeded(string droneId, DroneState lastState, int timeLastStateEndPlusOne, int timeNewTrajectoryStart)
     {
         if (ThereIsANeedToHoverAndWait(timeLastStateEndPlusOne, timeNewTrajectoryStart)) 
@@ -484,17 +484,14 @@ public class TrajectoryManager
                             );
         }
     }
-
     private bool NewTrajectoryStartsBeforePreviousEnds(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
     {
         return timeLastStateEndPlusOne > timeLinearTrajectoryStart;
     }
-
     private bool ThereIsANeedToHoverAndWait(int timeLastStateEndPlusOne, int timeTrajectoryStart)
     {
         return timeLastStateEndPlusOne < timeTrajectoryStart;
     }
-
     private bool NewTrajectoryStartsRightAfterPreviousEnds(int timeLastStateEndPlusOne, int timeLinearTrajectoryStart)
     {
         return timeLastStateEndPlusOne == timeLinearTrajectoryStart;
@@ -507,5 +504,4 @@ public class TrajectoryManager
     {
         return drones[droneId].DroneMode == DroneMode.Approx;
     }
-
 }

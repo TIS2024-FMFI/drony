@@ -527,7 +527,7 @@ public class TrajectoryManager
 
         for (int i = 0; i < numberOfPoints; i++)
         {
-            float angle = isClockwise ? 90 : -90;
+            float angle = isClockwise ? -90 : 90;
             Vector3 P1 = FindPointOnCircleByAB(SO, S, A, B, angle);
             Vector3 P1s = FindPointOnParallel(A, B, P1, Dx);
             points.Add(P1s);

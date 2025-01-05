@@ -29,11 +29,6 @@ public class UIManager
         }
     }
 
-    public void UpdatePlaybackSpeed()
-    {
-        throw new NotImplementedException("UpdatePlaybackSpeed is not implemented yet.");
-    }
-
     public void ProcessCommandFile(string path)
     {
         DroneSpawner.DestroyAllDrones();

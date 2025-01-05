@@ -82,8 +82,11 @@ public class TrajectoryManager
                 case Command.FlySpiral:
                     FlySpiralTrajectoryCommand(droneId, timestampMilliseconds, cmdArguments);
                     break;
-                case Command.flyCircle:
+                case Command.FlyCircle:
                     FlyCircleTrajectoryCommand(droneId, timestampMilliseconds, cmdArguments);
+                    break;
+                case Command.SetColor:
+                    SetColorCommand(droneId, timestampMilliseconds, cmdArguments);
                     break;
                 
             }  
@@ -98,6 +101,12 @@ public class TrajectoryManager
                         drones[droneId],
                         timestamp,
                         cmdArguments);
+    }
+    private void SetColorCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--SetColorCommand");
+        throw new NotImplementedException("SetColorCommand is not implemented yet.");
+        
     }
     private void TakeOffCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {

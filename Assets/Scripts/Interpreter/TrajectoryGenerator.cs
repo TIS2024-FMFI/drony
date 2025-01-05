@@ -260,16 +260,6 @@ namespace Interpreter
         {
             throw new NotImplementedException("GenerateParabolaTrajectory is not implemented yet.");
         }
-
-        public DroneTrajectory GeneratePointsTrajectory(
-                        DroneTrajectory droneTrajectory, 
-                        int timestamp, 
-                        CmdArgumentsDTO cmdArguments)
-        {
-            throw new NotImplementedException("GeneratePointsTrajectory is not implemented yet.");
-        }
-
-
     }
 
 

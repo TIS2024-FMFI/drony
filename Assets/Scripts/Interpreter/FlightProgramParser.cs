@@ -108,9 +108,10 @@ namespace Interpreter
                 "take-off" => Command.TakeOff,
                 "fly-to" => Command.FlyTo,
                 "fly-spiral" => Command.FlySpiral,
-                "fly-circle" => Command.flyCircle,
+                "fly-circle" => Command.FlyCircle,
                 "drone-mode" => Command.DroneMode,
                 "fly-trajectory" => Command.FlyTrajectory,
+                "set-color" => Command.SetColor,
                 "land" => Command.Land,
                 "hover" => Command.Hover,
                 _ => Command.Error
@@ -144,8 +145,9 @@ namespace Interpreter
                 Command.FlyTo => ParseLinearTrajectoryArgs(argumentsList),
                 Command.FlyTrajectory => ParseTrajectoryArgs(argumentsList),
                 Command.FlySpiral => ParseSpiralTrajectoryArgs(argumentsList),
-                Command.flyCircle => ParseCircleTrajectoryArgs(argumentsList),
+                Command.FlyCircle => ParseCircleTrajectoryArgs(argumentsList),
                 Command.DroneMode => ParseDroneModeArgs(argumentsList),
+                Command.SetColor => ParseSetColorArgs(argumentsList),
                 _ => new CmdArgumentsDTO()
             };
             
@@ -276,6 +278,18 @@ namespace Interpreter
             cmdArgumentsDTO.DroneMode = command;
 
             return cmdArgumentsDTO;
+        }
+
+        private CmdArgumentsDTO ParseSetColorArgs(List<string> args)
+        {
+            int.TryParse(args[0], out var r);
+            int.TryParse(args[1], out var g);
+            int.TryParse(args[2], out var b);
+            
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.Color = new Color(r, g, b);
+            return cmdArgumentsDTO;
+
         }
     }
 }

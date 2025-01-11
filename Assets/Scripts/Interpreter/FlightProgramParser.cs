@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
+using Drony.dto;
 using UnityEngine;
 
 namespace Interpreter
@@ -23,9 +25,11 @@ namespace Interpreter
 
             var line = _programLines[_currentLine];
 
-            while (line.Trim() == "")
+            while (line.Trim() == "" || line.Trim()[0] == '#')
             {
                 _currentLine++;
+                if (_currentLine >= _programLines.Count)
+                    return null;
                 line = _programLines[_currentLine];
             }
             _currentLine++;
@@ -37,19 +41,62 @@ namespace Interpreter
 
             return split.Take(commentIndex).ToList();
         }
+        private bool IsList(string input)
+        {
+            return input.StartsWith('[') && input.EndsWith(']');
+        }
 
-        public (TimeSpan, string, Command, List<object>) NextCommand()
+        private bool ContanisList(string input)
+        {
+            return input.Contains('[') && input.Contains(']');
+        }
+
+        private string RemoveBrackets(string input)
+        {
+            return input.Substring(1, input.Length - 2);
+        }
+
+        private List<string> ParseList(string input)
+        {
+            input = input.Trim();
+            if (IsList(input))
+            {
+                input = RemoveBrackets(input);
+            }
+            string[] elements = input.Split(',');
+            var result = elements.Select(e => e.Trim().Trim('\'', '"')).ToList();
+
+            return result;
+        }
+
+        private List<string> ParseListForTrajectory(string input)
+        {
+            input = input.Trim();
+            string pattern = @"\[(.*?)\]";
+            var matches = Regex.Matches(input, pattern);
+            var result = new List<string>();
+            foreach (Match match in matches)
+            {
+                result.Add(match.ToString());
+            }
+            return result;
+        }
+
+        public (TimeSpan, string, Command, CmdArgumentsDTO) NextCommand()
         {
             var line = NextLine();
 
             if (line is null)
-                return (TimeSpan.Zero, "", Command.Eof, new List<object>());
+                return (TimeSpan.Zero, "", Command.Eof, new CmdArgumentsDTO());
 
             if (line[0].ToLower() == "def")
             {
                 var name = line[1];
                 var value = string.Join(" ", line.Skip(2));
-                return (TimeSpan.Zero, "", Command.Constant, new List<object> { name, value });
+                CmdArgumentsDTO nameValueDTO = new CmdArgumentsDTO();
+                nameValueDTO.Name = name;
+                nameValueDTO.Value = value;
+                return (TimeSpan.Zero, "", Command.Constant, nameValueDTO);
             }
             
             TimeSpan.TryParse(line[0], out var timeStamp);
@@ -61,47 +108,188 @@ namespace Interpreter
                 "take-off" => Command.TakeOff,
                 "fly-to" => Command.FlyTo,
                 "fly-spiral" => Command.FlySpiral,
+                "fly-circle" => Command.FlyCircle,
                 "drone-mode" => Command.DroneMode,
                 "fly-trajectory" => Command.FlyTrajectory,
+                "set-color" => Command.SetColor,
                 "land" => Command.Land,
                 "hover" => Command.Hover,
                 _ => Command.Error
             };
 
-            var args = command switch
+            string arguments = string.Join(" ", line.Skip(3).Take(line.Count - 3));
+            List<string> argumentsList = new List<string>();
+
+            if (IsList(arguments))
             {
-                Command.TakeOff => ParseTakeOffArgs(line.Skip(3).ToList()),
-                Command.SetPos => ParseSetPositionArgs(line.Skip(3).ToList()),
-                Command.FlyTo => ParseLinearTrajectoryArgs(line.Skip(3).ToList()),
-                _ => new List<object>()
+                string withoutBrackets = RemoveBrackets(arguments);
+
+                if (ContanisList(withoutBrackets))
+                {
+                    argumentsList = ParseListForTrajectory(withoutBrackets);
+                } 
+                else 
+                {
+                    argumentsList = ParseList(arguments);
+                }
+            }
+            else 
+            {
+                argumentsList = line.Skip(3).ToList();
+            }
+
+            var cmdArgumentsDTO = command switch
+            {
+                Command.TakeOff => ParseTakeOffArgs(argumentsList),
+                Command.SetPos => ParseSetPositionArgs(argumentsList),
+                Command.FlyTo => ParseLinearTrajectoryArgs(argumentsList),
+                Command.FlyTrajectory => ParseTrajectoryArgs(argumentsList),
+                Command.FlySpiral => ParseSpiralTrajectoryArgs(argumentsList),
+                Command.FlyCircle => ParseCircleTrajectoryArgs(argumentsList),
+                Command.DroneMode => ParseDroneModeArgs(argumentsList),
+                Command.SetColor => ParseSetColorArgs(argumentsList),
+                _ => new CmdArgumentsDTO()
             };
             
-            return (timeStamp, droneId, command, args);
+            return (timeStamp, droneId, command, cmdArgumentsDTO);
         }
 
-        private List<object> ParseLinearTrajectoryArgs(List<string> args)
+        private CmdArgumentsDTO ParseLinearTrajectoryArgs(List<string> args)
         {
             int.TryParse(args[0], out var x);
             int.TryParse(args[1], out var y);
             int.TryParse(args[2], out var z);
-            var destinationPoint = new Vector3(x, y, z);
             int.TryParse(args[3], out var destinationYaw);
             int.TryParse(args[4], out var speed); 
-            return new List<object> { destinationPoint, destinationYaw, speed };
+
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.DestinationPosition = new Vector3(x, y, z);
+            cmdArgumentsDTO.DestinationYaw = Quaternion.Euler(0, destinationYaw, 0);
+            cmdArgumentsDTO.Speed = speed;
+
+            return cmdArgumentsDTO;
         }
 
-        private List<object> ParseSetPositionArgs(List<string> args)
+        private CmdArgumentsDTO ParseSetPositionArgs(List<string> args)
         {
             int.TryParse(args[0], out var x);
             int.TryParse(args[1], out var y);
             int.TryParse(args[2], out var z);
-            var startPoint = new Vector3(x, y, z);
-            return new List<object> {startPoint,};
+
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.StartPosition = new Vector3(x, y, z);
+
+            return cmdArgumentsDTO;
         }
-        private List<object> ParseTakeOffArgs(List<string> args)
+
+        private CmdArgumentsDTO ParseTakeOffArgs(List<string> args)
         {
             int.TryParse(args[0], out var height);
-            return new List<object> {height,};
+
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.DestinationHeight = height;
+
+            return cmdArgumentsDTO;
+        }
+
+        private CmdArgumentsDTO ParseTrajectoryArgs(List<string> args)
+        {
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.Points = new List<PointDTO>();
+            foreach (String arg in args)
+            {
+                List<string> pointData = ParseList(arg);
+                int.TryParse(pointData[0], out var x);
+                int.TryParse(pointData[1], out var y);
+                int.TryParse(pointData[2], out var z);
+                int.TryParse(pointData[3], out var destinationYaw);
+                int.TryParse(pointData[4], out var speed);
+                PointDTO pointDTO = new PointDTO();
+                pointDTO.Point = new Vector3(x, y, z);
+                pointDTO.DestinationYaw = Quaternion.Euler(0, destinationYaw, 0);
+                pointDTO.Speed = speed;
+                cmdArgumentsDTO.Points.Add(pointDTO);
+            }
+            return cmdArgumentsDTO;
+        }
+        
+        private CmdArgumentsDTO ParseSpiralTrajectoryArgs(List<string> args)
+        {
+            int.TryParse(args[0], out var x);
+            int.TryParse(args[1], out var y);
+            int.TryParse(args[2], out var z);
+            int.TryParse(args[3], out var xA);
+            int.TryParse(args[4], out var yA);
+            int.TryParse(args[5], out var zA);
+            int.TryParse(args[6], out var xB);
+            int.TryParse(args[7], out var yB);
+            int.TryParse(args[8], out var zB);
+            int.TryParse(args[9], out var clockwise);
+            int.TryParse(args[10], out var numberOfRevolutions);
+            int.TryParse(args[11], out var speed);
+
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.DestinationPosition = new Vector3(x, y, z);
+            cmdArgumentsDTO.PointA = new Vector3(xA, yA, zA);
+            cmdArgumentsDTO.PointB = new Vector3(xB, yB, zB);
+            cmdArgumentsDTO.IsClockwise = clockwise == 1;
+            cmdArgumentsDTO.NumberOfRevolutions = numberOfRevolutions;
+            cmdArgumentsDTO.Speed = speed;
+
+            return cmdArgumentsDTO;
+        }
+
+        private CmdArgumentsDTO ParseCircleTrajectoryArgs(List<string> args)
+        {
+            int.TryParse(args[0], out var x);
+            int.TryParse(args[1], out var y);
+            int.TryParse(args[2], out var z);
+            int.TryParse(args[3], out var xO);
+            int.TryParse(args[4], out var yO);
+            int.TryParse(args[5], out var zO);
+            int.TryParse(args[6], out var clockwise);
+            int.TryParse(args[7], out var numberOfRevolutions);
+            int.TryParse(args[8], out var speed);
+
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.DestinationPosition = new Vector3(x, y, z);
+            cmdArgumentsDTO.PointO = new Vector3(xO, yO, zO);
+            cmdArgumentsDTO.IsClockwise = clockwise == 1;
+            cmdArgumentsDTO.NumberOfRevolutions = numberOfRevolutions;
+            cmdArgumentsDTO.Speed = speed;
+
+            return cmdArgumentsDTO;
+        }
+
+        private CmdArgumentsDTO ParseDroneModeArgs(List<string> args)
+        {
+            DroneMode command = args[0] switch
+            {
+                "exact" => DroneMode.Exact,
+                "exactly" => DroneMode.Exact,
+                "e" => DroneMode.Exact,
+                "approx" => DroneMode.Approx,
+                "approximately" => DroneMode.Approx,
+                "a" => DroneMode.Approx,
+                _ => DroneMode.Error
+            };
+
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.DroneMode = command;
+
+            return cmdArgumentsDTO;
+        }
+
+        private CmdArgumentsDTO ParseSetColorArgs(List<string> args)
+        {
+            int.TryParse(args[0], out var r);
+            int.TryParse(args[1], out var g);
+            int.TryParse(args[2], out var b);
+            
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.Color = new Color(r, g, b);
+            return cmdArgumentsDTO;
+
         }
     }
 }

@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DroneSpawner : MonoBehaviour
 {
     public static DroneSpawner Instance { get; private set; }
+    public static List<GameObject> drones = new List<GameObject>();
     [SerializeField] private GameObject dronePrefab; // Drag the drone prefab in the Inspector
     [SerializeField] private Transform dronesParent; // Optional: Parent object to keep hierarchy organized
 
@@ -42,5 +44,14 @@ public class DroneSpawner : MonoBehaviour
         }
 
         Debug.Log($"Drone {droneId} has been spawned.");
+        drones.Add(newDrone);
+    }
+    
+    public static void DestroyAllDrones()
+    {
+        foreach (GameObject drone in drones)
+        {
+            Destroy(drone);
+        }
     }
 }

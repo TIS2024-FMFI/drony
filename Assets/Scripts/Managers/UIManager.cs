@@ -29,13 +29,11 @@ public class UIManager
         }
     }
 
-    public void UpdatePlaybackSpeed()
-    {
-        throw new NotImplementedException("UpdatePlaybackSpeed is not implemented yet.");
-    }
-
     public void ProcessCommandFile(string path)
     {
+        DroneSpawner.DestroyAllDrones();
+        trajectoryManager = TrajectoryManager.Reinstanciate();
+
         string content = Utilities.ReadTextFile(path);
         CommandFileSplitter commandFileSplitter = new CommandFileSplitter(content);
         List<string> commandSection = commandFileSplitter.GetCommandSection();
@@ -65,6 +63,30 @@ public class UIManager
     public string GetCommandFileName()
     {
         return commandFileName;
+    }
+    public int GetTotalTime()
+    {
+        return trajectoryManager.totalTime;
+    }
+    public int GetCurrentTime()
+    {
+        return trajectoryManager.GetCurrentTime();
+    }
+    public void UpdateCurrentTime()
+    {
+        trajectoryManager.UpdateCurrentTime();
+    }
+    public void SetCurrentTime(int time)
+    {
+        trajectoryManager.SetCurrentTime(time);
+    }
+    public void SetPlaybackSpeed(float playbackSpeed)
+    {
+        trajectoryManager.SetPlaybackSpeed(playbackSpeed);
+    }
+    public void ResetCurrentTime()
+    {
+        trajectoryManager.ResetCurrentTime();
     }
 }
 

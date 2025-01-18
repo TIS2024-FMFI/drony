@@ -27,22 +27,17 @@
 
                 <engine:VisualElement class="card">
                     <engine:VisualElement class="card-header">
-                        <engine:Label text="Visual Settings" class="card-title" />
-                    </engine:VisualElement>
-                    <engine:Toggle label="Show Audio Visualization" name="show-waveform" class="toggle" />
-                </engine:VisualElement>
-
-                <engine:VisualElement class="card">
-                    <engine:VisualElement class="card-header">
                         <engine:Label text="Wall Settings" class="card-title" />
                     </engine:VisualElement>
                     <engine:DropdownField name="wall-selector" label="Select Surface" class="dropdown" />
                     <engine:VisualElement class="input-group">
-                        <engine:Label text="Surface Color" class="input-label" />
-                        <!-- <engine:ColorField name="wall-color" class="color-picker" /> -->
+                        <engine:Label text="Red" class="input-label" />
+                        <engine:Slider name="color-slider-red" low-value="0" high-value="1" value="1" class="slider" />
+                        <engine:Label text="Green" class="input-label" />
+                        <engine:Slider name="color-slider-green" low-value="0" high-value="1" value="1" class="slider" />
+                        <engine:Label text="Blue" class="input-label" />
+                        <engine:Slider name="color-slider-blue" low-value="0" high-value="1" value="1" class="slider" />
                     </engine:VisualElement>
-                        <engine:Button text="Upload Wall Texture" name="wall-texture-upload" class="upload-button" />
-                            <engine:Label text="No texture loaded" name="wall-texture-label" class="support-text" />
                 </engine:VisualElement>
 
                 <engine:VisualElement class="card">

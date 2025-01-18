@@ -10,36 +10,9 @@ namespace Drony.Entities
         public Color Color { get; set; } 
         public Quaternion YawAngle { get; set; }
         public int Time { get; set; } 
+        public bool IsKeyState { get; set; }
 
-        public DroneState(Vector3 position, Color color, Quaternion yawAngle, int time)
-        {
-            Position = position;
-            Color = color;
-            YawAngle = yawAngle;
-            Time = time;
-        }
-
-        public DroneState(Vector3 position, Quaternion yawAngle, int time) 
-        {
-            Position = position;
-            YawAngle = yawAngle;
-            Time = time;
-        }
-
-        public DroneState(Vector3 position, Quaternion yawAngle) 
-        {
-            Position = position;
-            YawAngle = yawAngle;
-        }
-
-        public DroneState(Vector3 position) 
-        {
-            Position = position;
-        }
-
-        public DroneState(int time) 
-        {
-            Time = time;
+        public DroneState() {
         }
 
         public DroneState(DroneState other)
@@ -48,6 +21,7 @@ namespace Drony.Entities
             Color = other.Color;
             YawAngle = other.YawAngle;
             Time = other.Time;
+            IsKeyState = other.IsKeyState;
         }
     }
 }

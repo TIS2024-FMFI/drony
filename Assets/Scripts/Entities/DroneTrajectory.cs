@@ -9,27 +9,13 @@ namespace Drony.Entities
     {
         public string DroneId { get; set; }
         public List<DroneState> Trajectory { get; set; }
-        public int LastStateIndex { get; set; }
+        public List<DroneState> KeyStates {get; set; }
+        public int LastStateIndex { get; set; } // index of the last state that was updated
+        public DroneMode DroneMode { get; set; }
 
-        public DroneTrajectory(string droneID) 
-        {
-            DroneId = droneID;
-            Trajectory = new List<DroneState>();
-            LastStateIndex = 0;
-        }
-
-        public DroneTrajectory(string droneID, DroneState initialState)
-        {
-            DroneId = droneID;
-            Trajectory = new List<DroneState>() { initialState };
-            LastStateIndex = 0;
-        }
-
-        public DroneTrajectory(string droneID, List<DroneState> emptyTrajectory) 
-        {
-            DroneId = droneID;
-            Trajectory = emptyTrajectory;
-            LastStateIndex = 0;  // the trajectory is empty, so there is no need to append LastStateIndex
+        public DroneTrajectory() {
+            KeyStates = new List<DroneState>();
+            DroneMode = DroneMode.Exact;
         }
 
         public DroneTrajectory(DroneTrajectory other)
@@ -40,12 +26,20 @@ namespace Drony.Entities
             for (int i = 0; i < other.Count; i++) {
                 Trajectory.Add(other.Trajectory[i]);
             }
+            KeyStates = new List<DroneState>();
+            foreach (DroneState droneState in other.KeyStates) {
+                KeyStates.Add(droneState);
+            }
+            DroneMode = other.DroneMode;
+            
         }
 
         public void addTrajectory(List<Vector3> newTrajectory) 
         {
-            for (int i = 0; i < newTrajectory.Count; i++) {
-                Trajectory.Add(new DroneState(newTrajectory[i]));
+            for (int timeMoment = 0; timeMoment < newTrajectory.Count; timeMoment++) {
+                DroneState newDroneState = new DroneState();
+                newDroneState.Position = newTrajectory[timeMoment];
+                Trajectory.Add(newDroneState);
             }
         }
 
@@ -82,7 +76,7 @@ namespace Drony.Entities
             return this[LastStateIndex];
         }
 
-        public DroneState getNext(int playbackSpeed, int currentStateIndex) {
+        public DroneState getNext(int currentStateIndex) {
             
             if (currentStateIndex < 0 || currentStateIndex >= Trajectory.Count) {
                 // TODO: implement custom exception
@@ -91,6 +85,12 @@ namespace Drony.Entities
             DroneState next = Trajectory[currentStateIndex];
             
             return next;
+        }
+
+        public void setLastAsKeyState() {
+            Trajectory[LastStateIndex].IsKeyState = true;
+            KeyStates.Add(Trajectory[LastStateIndex]);
+            Debug.Log($"Set key state: {Trajectory[LastStateIndex].Time}");
         }
     }
 }

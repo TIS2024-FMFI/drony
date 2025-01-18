@@ -7,10 +7,12 @@ namespace Interpreter
         TakeOff,
         FlyTo,
         FlySpiral,
+        FlyCircle,
         DroneMode,
         FlyTrajectory,
         Land,
         Hover,
+        SetColor,
         Eof,
         Error
     }

@@ -12,11 +12,6 @@ public class TimeBarController : MonoBehaviour
     private int currentTime = 0;
     private bool isTiming = false;
     private float timeMultiplier = 1f;
-    private UIManager uimanager;
-    void OnEnable()
-    {
-        uimanager = UIManager.Instance;
-    }
 
     void Start()
     {
@@ -40,20 +35,20 @@ public class TimeBarController : MonoBehaviour
         
         if (isTiming)
         {
-            currentTime = uimanager.GetCurrentTime();
+            currentTime = UIManager.Instance.GetCurrentTime();
             if (currentTime >= totalTimeLength)
             {
-                uimanager.SetCurrentTime(totalTimeLength);
-                currentTime = uimanager.GetCurrentTime();
+                UIManager.Instance.SetCurrentTime(totalTimeLength);
+                currentTime = UIManager.Instance.GetCurrentTime();
                 isTiming = false;
                 playPauseButton.text = "Play";
                 RestartTimer();
             }
-            uimanager.UpdateCurrentTime();
+            UIManager.Instance.UpdateCurrentTime();
             UpdateCurrentTime(currentTime);
             UpdateTimeProgressBar(currentTime, totalTimeLength);
         }
-        totalTimeLength = uimanager.GetTotalTime();
+        totalTimeLength = UIManager.Instance.GetTotalTime();
         SetTotalTime(totalTimeLength);
     }
 
@@ -66,7 +61,7 @@ public class TimeBarController : MonoBehaviour
 
     private void UpdateAudioState()
     {
-        
+
         if (isTiming)
         {
             AudioManager.Instance.PlayAudio();
@@ -81,7 +76,7 @@ public class TimeBarController : MonoBehaviour
     {
         isTiming = false;
         currentTime = 0;
-        uimanager.ResetCurrentTime();
+        UIManager.Instance.ResetCurrentTime();
         UpdateCurrentTime(currentTime);
         UpdateTimeProgressBar(currentTime, totalTimeLength);
         playPauseButton.text = "Play";
@@ -110,7 +105,7 @@ public class TimeBarController : MonoBehaviour
     {
         timeMultiplier = multiplier;
         Debug.Log($"Timeline speed set to {multiplier}x");
-        uimanager.SetPlaybackSpeed(timeMultiplier);
+        UIManager.Instance.SetPlaybackSpeed(timeMultiplier);
     }
 
     private string FormatTime(float timeInMilliseconds)

@@ -212,4 +212,13 @@
     .number-input {
     color: #2e2e2e;
     padding: 5px;
+    }
+    .drone-toggles {
+    color: white;
+    font-size: 14px;
 }
+
+    .toggle {
+        color: white;
+        font-size: 14px;
+    }

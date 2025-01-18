@@ -16,6 +16,7 @@ public class UIManager : MonoBehaviour
     private static UIManager _instance;
     private TrajectoryManager trajectoryManager;
     private string commandFileName;
+    private RoomUIController roomUIController;
 
     public static UIManager Instance
     {
@@ -30,10 +31,15 @@ public class UIManager : MonoBehaviour
             return _instance;
         }
     }
-
     private void Awake()
     {
         trajectoryManager = TrajectoryManager.Instance;
+
+        roomUIController = FindObjectOfType<RoomUIController>();
+        if (roomUIController == null)
+        {
+            Debug.LogError("RoomUIController not found! Make sure it is in the scene.");
+        }
     }
 
     public async void ProcessCommandFile(string path)
@@ -61,6 +67,12 @@ public class UIManager : MonoBehaviour
         {
             DroneSpawner.Instance.SpawnDrone(id);
             await Task.Yield();
+        }
+        // Refresh UI toggles with new drones
+        if (roomUIController != null)
+        {
+            Debug.Log("Refreshing drone toggles...");
+            roomUIController.RefreshDroneToggles();
         }
 
         commandFileName = $"Loaded: {Path.GetFileName(path)}";

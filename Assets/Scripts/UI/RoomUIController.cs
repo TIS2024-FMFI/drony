@@ -1,10 +1,12 @@
-﻿using UnityEditor.UIElements;
+﻿using System.Collections.Generic;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class RoomUIController : MonoBehaviour
 {
     public RoomController roomController;
+    public DroneSpawner droneSpawner;
 
     private FloatField widthInput;
     private FloatField depthInput;
@@ -15,43 +17,58 @@ public class RoomUIController : MonoBehaviour
     private Slider colorSliderGreen;
     private Slider colorSliderBlue;
 
+    private FloatField droneWidthMultiplier;
+    private FloatField droneHeightMultiplier;
+    private FloatField droneDepthMultiplier;
+    private VisualElement droneTogglesContainer;
+    private Dictionary<string, Toggle> droneToggles;
+
 
     void Start()
     {
-        // Získanie root elementu (pripojený cez UIDocument)
         var root = GetComponent<UIDocument>().rootVisualElement;
-
-        // Načítanie FloatField prvkov podľa `name` z UXML
         widthInput = root.Q<FloatField>("width-input");
         depthInput = root.Q<FloatField>("depth-input");
         heightInput = root.Q<FloatField>("height-input");
 
-        // Prepojenie zmien s callbackom
         widthInput.RegisterValueChangedCallback(evt => UpdateRoomSize());
         depthInput.RegisterValueChangedCallback(evt => UpdateRoomSize());
         heightInput.RegisterValueChangedCallback(evt => UpdateRoomSize());
 
-        // Načítanie DropdownField a ColorField
         wallSelector = root.Q<DropdownField>("wall-selector");
         colorSliderRed = root.Q<Slider>("color-slider-red");
         colorSliderGreen = root.Q<Slider>("color-slider-green");
         colorSliderBlue = root.Q<Slider>("color-slider-blue");
-
-        // Pridanie možností pre DropdownField
         wallSelector.choices = new System.Collections.Generic.List<string> {
-            "Wall1", // Predná stena
-            "Wall2", // Pravá stena
-            "Wall3", // Zadná stena
-            "Wall4", // Ľavá stena
-            "Floor", // Podlaha
-            "Roof"   // Strop
+            "Wall1",
+            "Wall2",
+            "Wall3",
+            "Wall4",
+            "Floor",
+            "Roof"
         };
-        wallSelector.value = "Wall1"; // Predvolená hodnota
+        wallSelector.value = "Wall1";
 
-        // Prepojenie zmien farby s callbackom
+
         colorSliderRed.RegisterValueChangedCallback(evt => UpdateWallColor());
         colorSliderGreen.RegisterValueChangedCallback(evt => UpdateWallColor());
         colorSliderBlue.RegisterValueChangedCallback(evt => UpdateWallColor());
+
+        droneWidthMultiplier = root.Q<FloatField>("drone-width");
+        droneHeightMultiplier = root.Q<FloatField>("drone-height");
+        droneDepthMultiplier = root.Q<FloatField>("drone-depth");
+        droneWidthMultiplier.value = 1;
+        droneHeightMultiplier.value = 1;
+        droneDepthMultiplier.value = 1;
+
+        droneWidthMultiplier.RegisterValueChangedCallback(evt => UpdateSelectedDronesScale());
+        droneHeightMultiplier.RegisterValueChangedCallback(evt => UpdateSelectedDronesScale());
+        droneDepthMultiplier.RegisterValueChangedCallback(evt => UpdateSelectedDronesScale());
+        droneTogglesContainer = root.Q<VisualElement>("drone-toggles");
+        droneToggles = new Dictionary<string, Toggle>();
+
+        PopulateDroneToggles();
+
     }
 
     private void UpdateRoomSize()
@@ -76,23 +93,21 @@ public class RoomUIController : MonoBehaviour
 
         Debug.Log($"Width: {width}, Height: {height}, Depth: {depth}");
 
-        // Zmena veľkosti miestnosti
+ 
         roomController.ResizeRoom(width, depth, height);
     }
 
     private void UpdateWallColor()
     {
-        // Získanie RGB hodnôt zo sliderov
         float red = colorSliderRed.value;
         float green = colorSliderGreen.value;
         float blue = colorSliderBlue.value;
 
-        // Vytvorenie novej farby
+
         Color newColor = new Color(red, green, blue);
 
         Debug.Log($"Updating wall color to: R={red}, G={green}, B={blue}");
 
-        // Zmena farby na vybranom povrchu
         switch (wallSelector.value)
         {
             case "Wall1":
@@ -115,4 +130,54 @@ public class RoomUIController : MonoBehaviour
                 break;
         }
     }
+
+    private void PopulateDroneToggles()
+    {
+        if (droneTogglesContainer == null)
+        {
+            Debug.LogError("droneTogglesContainer is null. Ensure the VisualElement with name 'drone-toggles' exists in the UXML and is properly referenced.");
+            return;
+        }
+
+        droneTogglesContainer.Clear();
+        droneToggles.Clear();
+        Debug.Log("Cleared toggles...");
+        foreach (var drone in DroneSpawner.drones)
+        {
+            Debug.Log("drones iterated...");
+            if (drone != null)
+            {
+                string droneName = drone.name;
+                Toggle toggle = new Toggle { label = droneName, value = true };
+                droneTogglesContainer.Add(toggle);
+                droneToggles[droneName] = toggle;
+            }
+        }
+        Debug.Log("PopulateDroneToggles done...");
+    }
+
+
+    private void UpdateSelectedDronesScale()
+    {
+        float width = Mathf.Clamp(droneWidthMultiplier.value, 0.1f, 20f);
+        float height = Mathf.Clamp(droneHeightMultiplier.value, 0.1f, 20f);
+        float depth = Mathf.Clamp(droneDepthMultiplier.value, 0.1f, 20f);
+
+        foreach (var drone in DroneSpawner.drones)
+        {
+            if (drone != null && droneToggles.TryGetValue(drone.name, out Toggle toggle) && toggle.value)
+            {
+                drone.transform.localScale = new Vector3(width, height, depth);
+                Debug.Log($"Updated scale of {drone.name} to: Width={width}, Height={height}, Depth={depth}");
+            }
+        }
+    }
+
+    public void RefreshDroneToggles()
+    {
+        Debug.Log("Populating drone toggles...");
+        PopulateDroneToggles();
+    }
+
+
 }

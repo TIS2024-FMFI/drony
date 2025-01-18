@@ -1,50 +1,72 @@
-using System;
-using System.Collections.Generic; 
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Drony.Entities;
 using UnityEngine;
 using System.IO;
 using Interpreter;
 using Utility;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Singleton class <c>UIManager</c> manages logic for UI
 /// </summary>
-public class UIManager 
+public class UIManager : MonoBehaviour
 {
     private static UIManager _instance;
     private TrajectoryManager trajectoryManager;
     private string commandFileName;
-    private UIManager() { 
-        trajectoryManager = TrajectoryManager.Instance;
-    }
+
     public static UIManager Instance
     {
         get
         {
             if (_instance == null)
             {
-                _instance = new UIManager(); 
+                GameObject uiManagerGameObject = new GameObject("UIManager");
+                _instance = uiManagerGameObject.AddComponent<UIManager>();
+                DontDestroyOnLoad(uiManagerGameObject);
             }
             return _instance;
         }
     }
 
-    public void ProcessCommandFile(string path)
+    private void Awake()
     {
-        DroneSpawner.DestroyAllDrones();
-        trajectoryManager = TrajectoryManager.Reinstanciate();
+        trajectoryManager = TrajectoryManager.Instance;
+    }
 
-        string content = Utilities.ReadTextFile(path);
-        CommandFileSplitter commandFileSplitter = new CommandFileSplitter(content);
-        List<string> commandSection = commandFileSplitter.GetCommandSection();
-        trajectoryManager.LoadTrajectories(commandSection);
-        List<string> droneIds = trajectoryManager.GetDroneIds();
+    public async void ProcessCommandFile(string path)
+    {
+        LoadingManager.Instance.ShowLoading();
+
+        List<string> commandSection = null;
+        List<string> droneIds = null;
+
+        await Task.Run(() =>
+        {
+            trajectoryManager = TrajectoryManager.Reinstanciate();
+
+            string content = Utilities.ReadTextFile(path);
+            CommandFileSplitter commandFileSplitter = new CommandFileSplitter(content);
+            commandSection = commandFileSplitter.GetCommandSection();
+
+            trajectoryManager.LoadTrajectories(commandSection);
+
+            droneIds = trajectoryManager.GetDroneIds();
+        });
+        DroneSpawner.DestroyAllDrones();
+
         foreach (var id in droneIds)
         {
             DroneSpawner.Instance.SpawnDrone(id);
+            await Task.Yield();
         }
+
         commandFileName = $"Loaded: {Path.GetFileName(path)}";
+        LoadingManager.Instance.HideLoading();
     }
+
 
     public void ProcessWallTexture(string path)
     {

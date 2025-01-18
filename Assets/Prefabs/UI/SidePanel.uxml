@@ -90,5 +90,6 @@
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:Button name="toggle-panel-button" class="toggle-panel-button">
+        </engine:Button>
     </engine:VisualElement>
 </engine:UXML>

@@ -66,6 +66,7 @@ public class TimeBarController : MonoBehaviour
 
     private void UpdateAudioState()
     {
+        
         if (isTiming)
         {
             AudioManager.Instance.PlayAudio();

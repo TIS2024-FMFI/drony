@@ -257,7 +257,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2fa81dd634b94c04b4c126813f9cb38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dronePrefab: {fileID: 3277047153121269390, guid: fcf296e5c2f27445d8151f22cc571d40, type: 3}
+  dronePrefab: {fileID: 3974827529141829005, guid: f7ebb680e13c186448a51ee9025e6acf, type: 3}
   dronesParent: {fileID: 2100245094}
 --- !u!114 &275688341
 MonoBehaviour:

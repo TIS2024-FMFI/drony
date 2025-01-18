@@ -22,6 +22,7 @@ public class DroneScript : MonoBehaviour
     private GUIStyle style;
     private Vector3 previousBezierPoint;
     private bool previousBezierPointSet = false;
+    private DroneLightController lightController;
 
     public float speed;
 
@@ -30,6 +31,15 @@ public class DroneScript : MonoBehaviour
         Debug.Log($"Initializing drone with id: {droneId}");
         trajectoryManager = TrajectoryManager.Instance;
         id = droneId;
+        lightController = GetComponentInChildren<DroneLightController>();
+        if (lightController != null)
+        {
+            //lightController.ChangeLightColor(Color.green); // Ensure the light starts OFF
+        }
+        else
+        {
+            Debug.LogError($"Drone {id}: No DroneLightController found!");
+        }
     }
 
 
@@ -56,6 +66,15 @@ public class DroneScript : MonoBehaviour
         transform.rotation = currentState.YawAngle;
         currentTime = currentState.Time;
         markerPositions.Add(new GizmosState(transform.position, color, "", currentTime, style));
+    }
+
+    public void ActivateLight(Color newColor)
+    {
+        if (lightController != null)
+        {
+            lightController.ChangeLightColor(newColor);
+            Debug.Log($"Drone {id}: Light activated with color {newColor}");
+        }
     }
 
     private void OnDrawGizmos()

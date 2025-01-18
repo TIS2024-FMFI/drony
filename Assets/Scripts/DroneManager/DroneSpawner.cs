@@ -42,7 +42,8 @@ public class DroneSpawner : MonoBehaviour
         {
             Debug.LogError("DroneScript is missing on the prefab!");
         }
-
+        Color randomColor = new Color(Random.value, Random.value, Random.value);
+        droneScript?.ActivateLight(randomColor);
         Debug.Log($"Drone {droneId} has been spawned.");
         drones.Add(newDrone);
     }
@@ -52,6 +53,26 @@ public class DroneSpawner : MonoBehaviour
         foreach (GameObject drone in drones)
         {
             Destroy(drone);
+        }
+    }
+
+    public static void ActivateAllDroneLights()
+    {
+        foreach (GameObject drone in drones)
+        {
+            DroneScript droneScript = drone.GetComponentInChildren<DroneScript>();
+            if (droneScript != null)
+            {
+                droneScript.ActivateLight(Color.blue); // Example: Turn on all lights as blue
+            }
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            ActivateAllDroneLights();
         }
     }
 }

@@ -1279,6 +1279,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1637138368210782702, guid: fc2cdcce2d069f84aa1f5bd9c18552f5, type: 3}
+      propertyPath: droneSpawner
+      value: 
+      objectReference: {fileID: 275688340}
+    - target: {fileID: 1637138368210782702, guid: fc2cdcce2d069f84aa1f5bd9c18552f5, type: 3}
       propertyPath: roomController
       value: 
       objectReference: {fileID: 3659676610313997261}

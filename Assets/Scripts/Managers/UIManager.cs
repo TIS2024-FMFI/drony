@@ -92,7 +92,16 @@ public class UIManager : MonoBehaviour
 
     public void ProcessMusicFile(string path)
     {
-        throw new NotImplementedException("ProcessMusicFile is not implemented yet.");
+        if (File.Exists(path))
+        {
+            Debug.Log($"Processing Music File: {path}");
+            AudioManager.Instance.LoadAndPlayMusic(path);
+        }
+        else
+        {
+            Debug.LogError($"Music file not found: {path}");
+        }
+        //throw new NotImplementedException("ProcessMusicFile is not implemented yet.");
     }
     public string GetCommandFileName()
     {

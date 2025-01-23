@@ -95,15 +95,11 @@ namespace Drony.Entities
 
         public void UpdateColorForFutureStates(int timestamp, Color newColor)
         {
-            bool colorUpdated = false;
 
-            // Iterate through all states
-            for (int i = LastStateIndex; i < Trajectory.Count; i++)
+            for (int i = 0; i < Trajectory.Count; i++)
             {
-                // Find the state with the timestamp equal or greater
                 if (Trajectory[i].Time >= timestamp)
                 {
-                    // Update color for this and all subsequent states
                     Trajectory[i].Color = newColor;
                 }
             }

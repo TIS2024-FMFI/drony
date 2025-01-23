@@ -29,8 +29,8 @@ public class FreeMovement : MonoBehaviour
 
     private void Update()
     {
-        // Only handle looking when LMB is pressed
-        if (Input.GetMouseButton(0))
+        // Only handle looking when RMB is pressed
+        if (Input.GetMouseButton(1))
         {
             yaw += Input.GetAxis("Mouse X") * lookSpeed;
             pitch -= Input.GetAxis("Mouse Y") * lookSpeed;

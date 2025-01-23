@@ -7,7 +7,7 @@ namespace Drony.Entities
     public class DroneState
     {
         public Vector3 Position { get; set; }
-        public Color Color { get; set; } 
+        public Color Color { get; set; } = Color.white;
         public Quaternion YawAngle { get; set; }
         public int Time { get; set; } 
         public bool IsKeyState { get; set; }

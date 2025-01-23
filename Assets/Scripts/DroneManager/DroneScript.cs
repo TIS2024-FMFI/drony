@@ -66,10 +66,18 @@ public class DroneScript : MonoBehaviour
         transform.rotation = currentState.YawAngle;
         currentTime = currentState.Time;
         markerPositions.Add(new GizmosState(transform.position, color, "", currentTime, style));
+        Debug.Log($"Drone {id}: Time {currentState.Time}, Position {currentState.Position}, Color {currentState.Color}");
+        if (currentState.Color != color)
+        {
+            Debug.Log($"Drone {id}: Checking light activation. Current: {color}, New: {currentState.Color}");
+            ActivateLight(currentState.Color);
+        }
+        color = currentState.Color;
     }
 
     public void ActivateLight(Color newColor)
     {
+
         if (lightController != null)
         {
             lightController.ChangeLightColor(newColor);

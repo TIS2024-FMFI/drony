@@ -46,7 +46,7 @@ namespace Drony.Entities
         public void addState(DroneState state) 
         {
             Trajectory.Add(state);
-            
+            Debug.Log($"Adding state with color: {state.Color}");
         }
 
         public int Count
@@ -91,6 +91,22 @@ namespace Drony.Entities
             Trajectory[LastStateIndex].IsKeyState = true;
             KeyStates.Add(Trajectory[LastStateIndex]);
             Debug.Log($"Set key state: {Trajectory[LastStateIndex].Time}");
+        }
+
+        public void UpdateColorForFutureStates(int timestamp, Color newColor)
+        {
+            bool colorUpdated = false;
+
+            // Iterate through all states
+            for (int i = LastStateIndex; i < Trajectory.Count; i++)
+            {
+                // Find the state with the timestamp equal or greater
+                if (Trajectory[i].Time >= timestamp)
+                {
+                    // Update color for this and all subsequent states
+                    Trajectory[i].Color = newColor;
+                }
+            }
         }
     }
 }

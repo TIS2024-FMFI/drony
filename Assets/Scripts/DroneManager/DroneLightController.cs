@@ -13,7 +13,7 @@ public class DroneLightController : MonoBehaviour
 
         if (droneLight != null)
         {
-            droneLight.enabled = false;
+            droneLight.color = Color.white;
         }
     }
 

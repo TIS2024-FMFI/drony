@@ -55,24 +55,4 @@ public class DroneSpawner : MonoBehaviour
             Destroy(drone);
         }
     }
-
-    public static void ActivateAllDroneLights()
-    {
-        foreach (GameObject drone in drones)
-        {
-            DroneScript droneScript = drone.GetComponentInChildren<DroneScript>();
-            if (droneScript != null)
-            {
-                droneScript.ActivateLight(Color.blue); // Example: Turn on all lights as blue
-            }
-        }
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            ActivateAllDroneLights();
-        }
-    }
 }

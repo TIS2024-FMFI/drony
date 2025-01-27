@@ -89,6 +89,27 @@ public class TrajectoryManager
             }  
             drones[droneId].setLastAsKeyState();
             UpdateTotalTime(droneId);
+            SetRemainingTrajectoryForAllDrones();
+        }
+    }
+
+    private void SetRemainingTrajectoryForAllDrones()
+    {
+        foreach (KeyValuePair<string, DroneTrajectory> entry in drones)
+        {
+            string droneId = entry.Key;
+            SetRemainingStatesAsLastAdded(droneId);
+        }
+    }
+    private void SetRemainingStatesAsLastAdded(string droneId)
+    {
+        DroneState lastState = drones[droneId].getLastAdded();
+        int startTime = lastState.Time;
+        for (int i = startTime + 1; i < drones[droneId].Count; i++)
+        {
+            drones[droneId][i].Position = lastState.Position;
+            drones[droneId][i].YawAngle = lastState.YawAngle;
+            drones[droneId][i].Color = lastState.Color;
         }
     }
     private void SetPosCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class FreeMovement : MonoBehaviour
 {
@@ -29,6 +31,7 @@ public class FreeMovement : MonoBehaviour
 
     private void Update()
     {
+
         // Only handle looking when RMB is pressed
         if (Input.GetMouseButton(1))
         {

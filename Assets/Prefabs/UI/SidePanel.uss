@@ -1,210 +1,264 @@
-﻿    .side-panel {
-        min-width: 400px;
-        max-width: 400px; /* Maximálna šírka panela */
-        background-color: rgb(15, 23, 42);
-        border-left-color: rgb(51, 65, 85);
-        border-left-width: 1px;
-        padding: 16px;
-        flex-direction: column;
-        height:1800px;
-        margin-top: 20px;
-        margin-bottom: 80px;
-        border-radius: 25px;
-        translate: 0 0;
-        transition-property: translate;
-        transition-duration: 0.3s;
-        transition-timing-function: ease-out;
-    }
+.side-panel {
+    min-width: 400px;
+    max-width: 400px;
+    background-color: rgb(15, 23, 42);
+    border-left-color: rgb(51, 65, 85);
+    border-left-width: 1px;
+    padding: 16px;
+    flex-direction: column;
+    height: 1800px;
+    margin-top: 20px;
+    margin-bottom: 80px;
+    border-radius: 25px;
+    translate: 0 0;
+    transition-property: translate;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-out;
+}
 
-    .container {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1; /* Roztiahne sa na maximum dostupnej výšky */
-        padding: 20px;
-    }
+.container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 20px;
+}
 
-    .panel-title {
-        font-size: 20px;
-        -unity-font-style: bold;
-        color: rgb(241, 245, 249);
-        margin-bottom: 16px;
-    }
+.panel-title {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgb(241, 245, 249);
+    margin-bottom: 16px;
+}
 
-    .card {
-        background-color: rgba(30, 41, 59, 0.5);
-        border-color: rgb(51, 65, 85);
-        border-width: 1px;
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 16px;
-    }
+.card {
+    background-color: rgba(30, 41, 59, 0.5);
+    border-color: rgb(51, 65, 85);
+    border-width: 1px;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
 
-    .card-header {
-        flex-direction: row;
-        align-items: center;
-        margin-bottom: 8px;
-    }
+.card-header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
 
-    .card-title {
-        font-size: 16px;
-        -unity-font-style: bold;
-        color: rgb(241, 245, 249);
-    }
+.card-title {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(241, 245, 249);
+}
 
-    .upload-button {
-        background-color: rgb(37, 99, 235);
-        color: rgb(241, 245, 249);
-        border-radius: 4px;
-        padding: 8px;
-        margin-top: 8px;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-    }
+.upload-button {
+    background-color: rgb(37, 99, 235);
+    color: rgb(241, 245, 249);
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
 
-    .upload-button:hover {
-        background-color: rgb(29, 78, 216);
-    }
+.upload-button:hover {
+    background-color: rgb(29, 78, 216);
+}
 
-    .support-text {
-        font-size: 12px;
-        color: rgb(148, 163, 184);
-        -unity-text-align: middle-center;
-        margin-top: 4px;
-    }
+.support-text {
+    font-size: 12px;
+    color: rgb(148, 163, 184);
+    -unity-text-align: middle-center;
+    margin-top: 4px;
+}
 
-    .slider-container {
-        margin-top: 8px;
-    }
+.slider-container {
+    margin-top: 8px;
+}
 
-    .slider-label {
-        color: rgb(226, 232, 240);
-        margin-bottom: 8px;
-    }
+.slider-label {
+    color: rgb(226, 232, 240);
+    margin-bottom: 8px;
+}
 
-    .slider {
-        margin: 8px 0;
-    }
+.slider {
+    margin: 8px 0;
+}
 
-    .input-group {
-        margin-bottom: 8px;
-    }
+.input-group {
+    margin-bottom: 8px;
+}
 
-    .input-label {
-        color: rgb(226, 232, 240);
-        margin-bottom: 4px;
-    }
+.input-label {
+    color: rgb(226, 232, 240);
+    margin-bottom: 4px;
+}
 
-    .number-input {
-        background-color: rgb(30, 41, 59);
-        border-color: rgb(71, 85, 105);
-        border-width: 1px;
-        border-radius: 4px;
-        padding: 4px;
-        color: rgb(241, 245, 249);
-    }
+.number-input {
+    background-color: rgb(30, 41, 59);
+    border-color: rgb(71, 85, 105);
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 4px;
+    color: rgb(241, 245, 249);
+}
 
-    .toggle {
-        color: rgb(226, 232, 240);
-        margin: 4px 0;
-    }
+.toggle {
+    color: rgb(226, 232, 240);
+    margin: 4px 0;
+}
 
-    .dropdown {
-        background-color: rgb(30, 41, 59);
-        border-color: rgb(71, 85, 105);
-        border-width: 1px;
-        border-radius: 4px;
-        padding: 4px;
-        color: rgb(241, 245, 249);
-        margin: 4px 0;
-    }
+.dropdown {
+    background-color: rgb(30, 41, 59);
+    border-color: rgb(71, 85, 105);
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 4px;
+    color: rgb(241, 245, 249);
+    margin: 4px 0;
+}
 
-    .color-picker {
-        margin: 4px 0;
-    }
+.color-picker {
+    margin: 4px 0;
+}
 
-    .drone-toggles {
-        margin-bottom: 16px;
-    }
+.drone-toggles {
+    margin-bottom: 16px;
+}
 
-    .drone-inputs.show {
-        display: flex;
-        flex-direction: column;
-    }
+.drone-inputs.show {
+    display: flex;
+    flex-direction: column;
+}
 
-    .save-button {
-        background-color: rgb(37, 99, 235);
-        color: rgb(241, 245, 249);
-        border-radius: 4px;
-        padding: 12px;
-        margin-top: 16px;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-    }
+.save-button {
+    background-color: rgb(37, 99, 235);
+    color: rgb(241, 245, 249);
+    border-radius: 4px;
+    padding: 12px;
+    margin-top: 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
 
-    .save-button:hover {
-        background-color: rgb(29, 78, 216);
-    }
+.save-button:hover {
+    background-color: rgb(29, 78, 216);
+}
 
-    .header {
-        height: 80px;
-        background-color: rgb(15, 23, 42);
-        margin-bottom: 16px;
-    }
+.header {
+    height: 80px;
+    background-color: rgb(15, 23, 42);
+    margin-bottom: 16px;
+}
 
-    .scrollable-content {
-        flex-grow: 1;
-        overflow-y: auto;
-    }
+.scrollable-content {
+    flex-grow: 1;
+    overflow-y: auto;
+}
 
-    .footer {
-        height: 150px;
-        background-color: rgb(15, 23, 42);
-    }
+.footer {
+    height: 150px;
+    background-color: rgb(15, 23, 42);
+}
+
+.toggle-panel-button.panel-hidden {
+    left: 0;
+}
+
+.toggle-panel-button:hover {
+    background-color: rgb(30, 41, 59);
+}
+
+.toggle-panel-button:active {
+    background-color: rgb(51, 65, 85);
+}
+
+.side-panel.hidden {
+    translate: -420px 0;
+}
+
+.toggle-panel-button {
+    position: absolute;
+    left: 400px;
+    top: 50%;
+    translate: 0 -50%;
+    width: 32px;
+    height: 80px;
+    padding: 4px;
+    border-radius: 0 8px 8px 0;
+    background-color: rgb(15, 23, 42);
+    border-color: rgb(51, 65, 85);
+    border-width: 1px;
+    border-left-width: 0;
+    transition-property: left;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-out;
+    color: rgb(255, 255, 255);
+    font-size: 24px;
+    -unity-font-style: bold;
+    text-align: center;
+}
+
+.upload-music-button:hover {
+    background-color: rgb(29, 78, 216);
+}
+
+.upload-music-button {
+    background-color: rgb(37, 99, 235);
+    color: rgb(241, 245, 249);
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 16px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+}
+
+.side-panel.hidden {
+    translate: -420px 0;
+}
+
+.toggle-panel-button {
+    position: absolute;
+    left: 400px;
+    top: 50%;
+    translate: 0 -50%;
+    width: 32px;
+    height: 80px;
+    padding: 4px;
+    border-radius: 0 8px 8px 0;
+    background-color: rgb(15, 23, 42);
+    border-color: rgb(51, 65, 85);
+    border-width: 1px;
+    border-left-width: 0;
+    transition-property: left;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-out;
+
+    color: rgb(255, 255, 255);
+    font-size: 24px;
+    -unity-font-style: bold;
+    text-align: center;
 
 
-    .toggle-panel-button.panel-hidden {
-        left: 0;
-    }
+}
 
-    .toggle-panel-button:hover {
-        background-color: rgb(30, 41, 59);
-    }
+.number-input {
+    color: #2e2e2e;
+    padding: 5px;
+}
+.drone-toggles {
+    color: white;
+    font-size: 14px;
+}
 
-    .toggle-panel-button:active {
-        background-color: rgb(51, 65, 85);
-    }
+.toggle {
+    color: white;
+    font-size: 14px;
+}
 
-
-
-
-    .side-panel.hidden {
-        translate: -420px 0;
-    }
-
-    .toggle-panel-button {
-        position: absolute;
-        left: 400px;
-        top: 50%;
-        translate: 0 -50%;
-        width: 32px;
-        height: 80px;
-        padding: 4px;
-        border-radius: 0 8px 8px 0;
-        background-color: rgb(15, 23, 42);
-        border-color: rgb(51, 65, 85);
-        border-width: 1px;
-        border-left-width: 0;
-        transition-property: left;
-        transition-duration: 0.3s;
-        transition-timing-function: ease-out;
-
-        color: rgb(255, 255, 255);
-        font-size: 24px;
-        -unity-font-style: bold;
-        text-align: center;
-
-
-    }

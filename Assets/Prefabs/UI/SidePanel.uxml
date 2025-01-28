@@ -17,6 +17,14 @@
 
                 <engine:VisualElement class="card">
                     <engine:VisualElement class="card-header">
+                        <engine:Label text="Music File" class="card-title" />
+                    </engine:VisualElement>
+                    <engine:Button text="Upload Music File" name="upload-music-button" class="upload-music-button" />
+                    <engine:Label text="Supported formats: .mp3 .wav .ogg" name="file-name-label" class="support-text" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="card">
+                    <engine:VisualElement class="card-header">
                         <engine:Label text="Playback Speed" class="card-title" />
                     </engine:VisualElement>
                     <engine:VisualElement class="slider-container">
@@ -27,44 +35,36 @@
 
                 <engine:VisualElement class="card">
                     <engine:VisualElement class="card-header">
-                        <engine:Label text="Visual Settings" class="card-title" />
-                    </engine:VisualElement>
-                    <engine:Toggle label="Show Audio Visualization" name="show-waveform" class="toggle" />
-                </engine:VisualElement>
-
-                <engine:VisualElement class="card">
-                    <engine:VisualElement class="card-header">
                         <engine:Label text="Wall Settings" class="card-title" />
                     </engine:VisualElement>
                     <engine:DropdownField name="wall-selector" label="Select Surface" class="dropdown" />
                     <engine:VisualElement class="input-group">
-                        <engine:Label text="Surface Color" class="input-label" />
-                        <!-- <engine:ColorField name="wall-color" class="color-picker" /> -->
+                        <engine:Label text="Red" class="input-label" />
+                        <engine:Slider name="color-slider-red" low-value="0" high-value="1" value="1" class="slider" />
+                        <engine:Label text="Green" class="input-label" />
+                        <engine:Slider name="color-slider-green" low-value="0" high-value="1" value="1" class="slider" />
+                        <engine:Label text="Blue" class="input-label" />
+                        <engine:Slider name="color-slider-blue" low-value="0" high-value="1" value="1" class="slider" />
                     </engine:VisualElement>
-                        <engine:Button text="Upload Wall Texture" name="wall-texture-upload" class="upload-button" />
-                            <engine:Label text="No texture loaded" name="wall-texture-label" class="support-text" />
                 </engine:VisualElement>
 
                 <engine:VisualElement class="card">
                     <engine:VisualElement class="card-header">
                         <engine:Label text="Drone Settings" class="card-title" />
                     </engine:VisualElement>
-                    <engine:VisualElement class="drone-toggles">
-                        <engine:Toggle label="Drone 1" name="drone1" class="toggle" />
-                        <engine:Toggle label="Drone 2" name="drone2" class="toggle" />
-                        <engine:Toggle label="Drone 3" name="drone3" class="toggle" />
+                    <engine:VisualElement name="drone-toggles" class="drone-toggles">
                     </engine:VisualElement>
                     <engine:VisualElement class="drone-inputs">
                         <engine:VisualElement class="input-group">
-                            <engine:Label text="Width (cm)" class="input-label" />
+                            <engine:Label text="Width (multiplier)" class="input-label" />
                             <engine:FloatField name="drone-width" class="number-input" />
                         </engine:VisualElement>
                         <engine:VisualElement class="input-group">
-                            <engine:Label text="Height (cm)" class="input-label" />
+                            <engine:Label text="Height (multiplier)" class="input-label" />
                             <engine:FloatField name="drone-height" class="number-input" />
                         </engine:VisualElement>
                         <engine:VisualElement class="input-group">
-                            <engine:Label text="Depth (cm)" class="input-label" />
+                            <engine:Label text="Depth (multiplier)" class="input-label" />
                             <engine:FloatField name="drone-depth" class="number-input" />
                         </engine:VisualElement>
                             <engine:Button text="Upload Drone Model (.sdl)" name="drone-model-upload" class="upload-button" />
@@ -77,17 +77,19 @@
                         <engine:Label text="Simulation Space Size" class="card-title" />
                     </engine:VisualElement>
                     <engine:VisualElement class="input-group">
-                        <engine:Label text="Width (m)" class="input-label" />
+                        <engine:Label text="Width (Default 30)" class="input-label" />
                         <engine:FloatField name="width-input" class="number-input" />
                     </engine:VisualElement>
                     <engine:VisualElement class="input-group">
-                        <engine:Label text="Height (m)" class="input-label" />
+                        <engine:Label text="Height (Default 12)" class="input-label" />
                         <engine:FloatField name="height-input" class="number-input" />
                     </engine:VisualElement>
                     <engine:VisualElement class="input-group">
-                        <engine:Label text="Depth (m)" class="input-label" />
+                        <engine:Label text="Depth (Default 30)" class="input-label" />
                         <engine:FloatField name="depth-input" class="number-input" />
                     </engine:VisualElement>
+
+                    <engine:Button text="Upload Wall Texture" name="wall-texture-upload" class="upload-button" />
                 </engine:VisualElement>
             </engine:ScrollView>
             <engine:VisualElement name="footer" class="footer">

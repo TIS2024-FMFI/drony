@@ -131,5 +131,15 @@ public class UIManager : MonoBehaviour
     {
         trajectoryManager.ResetCurrentTime();
     }
+
+    public void CheckCollisions()
+    {
+        var collisions = trajectoryManager.GetCurrentCollisions();
+
+        foreach (var (d1, d2) in collisions)
+        {
+            Debug.LogError($"Drone collision: {d1}, {d2}");
+        }
+    }
 }
 

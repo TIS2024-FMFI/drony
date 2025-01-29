@@ -109,13 +109,13 @@ public class TimeBarController : MonoBehaviour
     }
 
     private string FormatTime(float timeInMilliseconds)
-{
-    float timeInSeconds = timeInMilliseconds / 1000f;
+    {
+        float timeInSeconds = timeInMilliseconds / 1000f;
 
-    int hours = Mathf.FloorToInt(timeInSeconds / 3600);
-    int minutes = Mathf.FloorToInt((timeInSeconds % 3600) / 60);
-    int seconds = Mathf.FloorToInt(timeInSeconds % 60);
-    int milliseconds = Mathf.FloorToInt(timeInMilliseconds % 1000);
-    return $"{hours:D1}:{minutes:D2}:{seconds:D2}.{milliseconds:D3}";
-}
+        int hours = Mathf.FloorToInt(timeInSeconds / 3600);
+        int minutes = Mathf.FloorToInt((timeInSeconds % 3600) / 60);
+        int seconds = Mathf.FloorToInt(timeInSeconds % 60);
+        int milliseconds = Mathf.FloorToInt(timeInMilliseconds % 1000);
+        return $"{hours:D1}:{minutes:D2}:{seconds:D2}.{milliseconds:D3}";
+    }
 }

@@ -14,6 +14,10 @@ public class DroneLightController : MonoBehaviour
         if (droneLight != null)
         {
             droneLight.color = Color.white;
+            droneLight.type = LightType.Point;
+            droneLight.intensity = 0.1f; 
+            droneLight.range = 0.1f;
+            droneLight.shadows = LightShadows.Soft;
         }
     }
 

@@ -32,14 +32,6 @@ public class DroneScript : MonoBehaviour
         trajectoryManager = TrajectoryManager.Instance;
         id = droneId;
         lightController = GetComponentInChildren<DroneLightController>();
-        if (lightController != null)
-        {
-            //lightController.ChangeLightColor(Color.green); // Ensure the light starts OFF
-        }
-        else
-        {
-            Debug.LogError($"Drone {id}: No DroneLightController found!");
-        }
     }
 
 
@@ -66,7 +58,6 @@ public class DroneScript : MonoBehaviour
         transform.rotation = currentState.YawAngle;
         currentTime = currentState.Time;
         markerPositions.Add(new GizmosState(transform.position, color, "", currentTime, style));
-        Debug.Log($"Drone {id}: Time {currentState.Time}, Position {currentState.Position}, Color {currentState.Color}");
         if (currentState.Color != color)
         {
             Debug.Log($"Drone {id}: Checking light activation. Current: {color}, New: {currentState.Color}");
@@ -77,7 +68,6 @@ public class DroneScript : MonoBehaviour
 
     public void ActivateLight(Color newColor)
     {
-
         if (lightController != null)
         {
             lightController.ChangeLightColor(newColor);

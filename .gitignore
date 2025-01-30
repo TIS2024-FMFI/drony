@@ -39,3 +39,5 @@ desktop.ini
 
 # Visual Studio Code workspace and settings files
 .vscode/
+
+.utmp/*

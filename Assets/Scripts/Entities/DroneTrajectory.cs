@@ -43,12 +43,6 @@ namespace Drony.Entities
             }
         }
 
-        public void addState(DroneState state) 
-        {
-            Trajectory.Add(state);
-            Debug.Log($"Adding state with color: {state.Color}");
-        }
-
         public int Count
         {
             get { return Trajectory.Count; }

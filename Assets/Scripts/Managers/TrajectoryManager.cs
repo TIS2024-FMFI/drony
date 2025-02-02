@@ -398,6 +398,7 @@ public class TrajectoryManager
         Debug.Log("--FlySpiralTrajectoryCommand");
         DroneState lastState = drones[droneId].getLastAdded();
 
+        
         Vector3 StartPosition = lastState.Position;
         Vector3 A = cmdArguments.PointA;
         Vector3 B = cmdArguments.PointB;
@@ -439,8 +440,19 @@ public class TrajectoryManager
     private void SetColorCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log("--SetColorCommand");
-        throw new NotImplementedException("SetColorCommand is not implemented yet.");
-        
+        if (cmdArguments.Color == null)
+        {
+            Debug.LogWarning($"No color specified for drone {droneId} at timestamp {timestamp}.");
+        }
+        Color newColor = cmdArguments.Color;
+        DroneTrajectory droneTrajectory = drones[droneId];
+        //DroneState lastState = droneTrajectory.getLastAdded();
+
+   
+        droneTrajectory.UpdateColorForFutureStates(timestamp, newColor);
+
+        //drones[droneId] = droneTrajectory;
+
     }
     private void DroneModeCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {

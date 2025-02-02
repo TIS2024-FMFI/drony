@@ -32,7 +32,6 @@ public class FreeMovement : MonoBehaviour
     private void Update()
     {
 
-        
         // Only handle looking when RMB is pressed
         if (Input.GetMouseButton(1))
         {

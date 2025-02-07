@@ -42,7 +42,6 @@ public class DroneSpawner : MonoBehaviour
         {
             Debug.LogError("DroneScript is missing on the prefab!");
         }
-
         Debug.Log($"Drone {droneId} has been spawned.");
         drones.Add(newDrone);
     }

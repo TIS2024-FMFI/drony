@@ -40,8 +40,7 @@ public class TimeBarController : MonoBehaviour
             {
                 UIManager.Instance.SetCurrentTime(totalTimeLength);
                 currentTime = UIManager.Instance.GetCurrentTime();
-                isTiming = false;
-                playPauseButton.text = "Play";
+                // playPauseButton.text = "Play";
                 RestartTimer();
             }
             UIManager.Instance.UpdateCurrentTime();
@@ -74,15 +73,15 @@ public class TimeBarController : MonoBehaviour
 
     private void RestartTimer()
     {
-        isTiming = false;
+        // isTiming = false;
         currentTime = 0;
         UIManager.Instance.ResetCurrentTime();
         UpdateCurrentTime(currentTime);
         UpdateTimeProgressBar(currentTime, totalTimeLength);
-        playPauseButton.text = "Play";
+        // playPauseButton.text = "Play";
 
         // Reset audio time and stop
-        AudioManager.Instance.StopAudio();
+        // AudioManager.Instance.StopAudio();
         AudioManager.Instance.SetAudioTime(0f);
     }
 

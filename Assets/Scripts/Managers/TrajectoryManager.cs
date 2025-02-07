@@ -86,10 +86,37 @@ public class TrajectoryManager
                 case Command.SetColor:
                     SetColorCommand(droneId, timestampMilliseconds, cmdArguments);
                     break;
+                case Command.Hover:
+                    HoverCommand(droneId, timestampMilliseconds, cmdArguments);
+                    break;
+                case Command.Land:
+                    LandCommand(droneId, timestampMilliseconds, cmdArguments);
+                    break;
                 
             }  
             drones[droneId].setLastAsKeyState();
             UpdateTotalTime(droneId);
+            SetRemainingTrajectoryForAllDrones();
+        }
+    }
+
+    private void SetRemainingTrajectoryForAllDrones()
+    {
+        foreach (KeyValuePair<string, DroneTrajectory> entry in drones)
+        {
+            string droneId = entry.Key;
+            SetRemainingStatesAsLastAdded(droneId);
+        }
+    }
+    private void SetRemainingStatesAsLastAdded(string droneId)
+    {
+        DroneState lastState = drones[droneId].getLastAdded();
+        int startTime = lastState.Time;
+        for (int i = startTime + 1; i < drones[droneId].Count; i++)
+        {
+            drones[droneId][i].Position = lastState.Position;
+            drones[droneId][i].YawAngle = lastState.YawAngle;
+            drones[droneId][i].Color = lastState.Color;
         }
     }
     private void SetPosCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
@@ -378,6 +405,7 @@ public class TrajectoryManager
         Debug.Log("--FlySpiralTrajectoryCommand");
         DroneState lastState = drones[droneId].getLastAdded();
 
+        
         Vector3 StartPosition = lastState.Position;
         Vector3 A = cmdArguments.PointA;
         Vector3 B = cmdArguments.PointB;
@@ -391,11 +419,13 @@ public class TrajectoryManager
             PointDTO pointDto = new PointDTO();
             pointDto.Point = point;
             pointDto.Speed = cmdArguments.Speed;
+            pointDto.DestinationYaw = lastState.YawAngle;
             points.Add(pointDto);
         }
         PointDTO DestinationPoint = new PointDTO();
         DestinationPoint.Point = DestinationPosition;
         DestinationPoint.Speed = cmdArguments.Speed;
+        DestinationPoint.DestinationYaw = lastState.YawAngle;
         points.Add(DestinationPoint);
 
         cmdArguments.Points = points;
@@ -414,14 +444,70 @@ public class TrajectoryManager
     private void HoverCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log("--HoverCommand");
-        throw new NotImplementedException("HoverCommand is not implemented yet.");
+        int hoverTimeInMillis = (int)cmdArguments.Time.TotalMilliseconds;
+        DroneState lastState = drones[droneId].getLastAdded();
+        int timeLastStateEndPlusOne = lastState.Time + 1;
+        int timeHoverTrajectoryStart = timestamp;
+
+
+        GenerateHoverTrajectoryIfNeeded(
+            droneId: droneId, 
+            lastState: lastState, 
+            timeLastStateEndPlusOne: timeLastStateEndPlusOne,
+            timeNewTrajectoryStart: timeHoverTrajectoryStart);
+
+
+        drones[droneId] = trajectoryGenerator.GenerateHoverTrajectory(
+                                new DroneTrajectory(drones[droneId]), 
+                                timestamp, 
+                                timestamp + hoverTimeInMillis, 
+                                lastState
+                            );
     }
     private void SetColorCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log("--SetColorCommand");
-        throw new NotImplementedException("SetColorCommand is not implemented yet.");
-        
+        if (cmdArguments.Color == null)
+        {
+            Debug.LogWarning($"No color specified for drone {droneId} at timestamp {timestamp}.");
+        }
+        Color newColor = cmdArguments.Color;
+        DroneTrajectory droneTrajectory = drones[droneId];
+        //DroneState lastState = droneTrajectory.getLastAdded();
+
+   
+        droneTrajectory.UpdateColorForFutureStates(timestamp, newColor);
+
+        //drones[droneId] = droneTrajectory;
+
     }
+    private void LandCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
+    {
+        Debug.Log("--LandCommand");
+        DroneState lastState = drones[droneId].getLastAdded();
+        int timeLastStateEndPlusOne = lastState.Time + 1;
+        int timeHoverTrajectoryStart = timestamp;
+
+        GenerateHoverTrajectoryIfNeeded(
+            droneId: droneId, 
+            lastState: lastState, 
+            timeLastStateEndPlusOne: timeLastStateEndPlusOne,
+            timeNewTrajectoryStart: timeHoverTrajectoryStart);
+        Vector3 lastPosition = lastState.Position;
+
+        Vector3 destinationPosition = new Vector3(lastPosition.x, 0, lastPosition.z);
+
+        drones[droneId] = trajectoryGenerator.GenerateLinearTrajectory(
+            droneTrajectory: drones[droneId], 
+            timestamp: timestamp, 
+            startPosition: lastPosition,
+            destinationPosition: destinationPosition,
+            startRotation: lastState.YawAngle,
+            targetRotation: lastState.YawAngle,
+            speed: TAKEOFF_SPEED
+        );
+    }
+
     private void DroneModeCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
         Debug.Log($"--SetDroneMode: {cmdArguments.DroneMode}");

@@ -32,7 +32,7 @@ The **Drone Simulator** is a Unity-based application designed to simulate choreo
    - Click *"Play"* in the Unity Editor.
 
 ### ✅ How to Test the Project
-- Load a sample flight program (`Assets/FlightPrograms/sample.txt`).
+- Load a sample flight program (`Assets/Resources/FlightPrograms/choreo.txt`). (Loading takes some time)
 - Load music file (optional)
 - Adjust simulation speed and other parameters in the UI.
 - Check for real-time collision detection.
@@ -42,7 +42,7 @@ The **Drone Simulator** is a Unity-based application designed to simulate choreo
 ## 📦 Installing the Built Version
 1. Download the latest build from [Releases](https://github.com/TIS2024-FMFI/drony/releases).
 2. Extract the files.
-3. Run `DroneSimulator.exe` (Windows) or `DroneSimulator.app` (macOS).
+3. Run `DroneSimulator.exe` (Windows), `DroneSimulator.app` (macOS) or `dronesAndroid.apk` (Android).
 
 ## ⚙️ Configuration & Customization
 - Modify simulation settings in the UI (playback speed, dimensions of drones, dimensions of room, colors of walls, etc.).

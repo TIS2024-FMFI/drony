@@ -1301,7 +1301,7 @@ PrefabInstance:
       addedObject: {fileID: 6936616463700666001}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: eda0031803d85974d994258f06815beb, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3911050425875017185}
+      addedObject: {fileID: 513935096190208925}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: eda0031803d85974d994258f06815beb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2658351530503431630}
@@ -1330,8 +1330,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
---- !u!135 &3911050425875017185
-SphereCollider:
+--- !u!65 &513935096190208925
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1349,7 +1349,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.22
+  m_Size: {x: 0.39, y: 0.21, z: 0.33}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &2658351530503431630
 Rigidbody:

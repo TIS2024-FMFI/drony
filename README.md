@@ -62,7 +62,7 @@ Contributions are welcome! To contribute:
 4. Submit a Pull Request.
 
 ## 📜 License
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is unlicensed. See the [LICENSE](LICENSE) file for details.
 
 ---
 

@@ -12,8 +12,7 @@ namespace Drony.Entities
         public int Time { get; set; } 
         public bool IsKeyState { get; set; }
 
-        public DroneState() {
-        }
+        public DroneState() { }
 
         public DroneState(DroneState other)
         {
@@ -22,6 +21,11 @@ namespace Drony.Entities
             YawAngle = other.YawAngle;
             Time = other.Time;
             IsKeyState = other.IsKeyState;
+        }
+
+        public bool IsInCollision(DroneState other, float tolerance = 1f)
+        {
+            return Vector3.Distance(other.Position, Position) <= tolerance && Time == other.Time;
         }
     }
 }

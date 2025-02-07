@@ -1,5 +1,6 @@
 using System;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using System.Linq;
 using Drony.Entities;
 using UnityEngine;
 using Interpreter;
@@ -589,5 +590,25 @@ public class TrajectoryManager
     private bool DroneModeIsApprox(string droneId)
     {
         return drones[droneId].DroneMode == DroneMode.Approx;
+    }
+
+    public List<(string, string)> GetCurrentCollisions()
+    {
+        var collisions = new HashSet<(string, string)>();
+        foreach (var (droneId1, trajectory1) in drones)
+        {
+            var drone1State = trajectory1.getNext(currentTime);
+            foreach (var (droneId2, trajectory2) in drones)
+            {
+                var drone2State = trajectory2.getNext(currentTime);
+                if (droneId1 != droneId2 && drone1State.IsInCollision(drone2State) &&
+                    !collisions.Contains((droneId2, droneId1)))
+                {
+                    collisions.Add((droneId1, droneId2));
+                }
+            }
+        }
+
+        return collisions.ToList();
     }
 }

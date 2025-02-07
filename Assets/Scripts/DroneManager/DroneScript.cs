@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Drony.Entities;
 using UnityEngine;
@@ -22,6 +23,7 @@ public class DroneScript : MonoBehaviour
     private GUIStyle style;
     private Vector3 previousBezierPoint;
     private bool previousBezierPointSet = false;
+    private float droneRadius = 0.05f;
     private DroneLightController lightController;
 
     public float speed;
@@ -113,7 +115,7 @@ public class DroneScript : MonoBehaviour
                 break;
             }
             Gizmos.color = marker.Color;
-            Gizmos.DrawSphere(marker.Position, 0.05f); // Draw small red spheres
+            Gizmos.DrawSphere(marker.Position, droneRadius); // Draw small red spheres
         }
     }
 }

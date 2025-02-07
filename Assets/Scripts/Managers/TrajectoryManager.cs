@@ -418,11 +418,13 @@ public class TrajectoryManager
             PointDTO pointDto = new PointDTO();
             pointDto.Point = point;
             pointDto.Speed = cmdArguments.Speed;
+            pointDto.DestinationYaw = lastState.YawAngle;
             points.Add(pointDto);
         }
         PointDTO DestinationPoint = new PointDTO();
         DestinationPoint.Point = DestinationPosition;
         DestinationPoint.Speed = cmdArguments.Speed;
+        DestinationPoint.DestinationYaw = lastState.YawAngle;
         points.Add(DestinationPoint);
 
         cmdArguments.Points = points;

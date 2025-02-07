@@ -1,32 +1,40 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DroneLightController : MonoBehaviour
 {
-    public Light droneLight;
+    private List<Material> diodMaterials;
+    private Renderer diodRenderer;
 
     private void Start()
     {
-        if (droneLight == null)
+        diodMaterials = new List<Material>();
+        
+        diodRenderer = GetComponent<Renderer>();
+
+        if (diodRenderer != null)
         {
-            droneLight = GetComponentInChildren<Light>();
+            foreach (Material mat in diodRenderer.materials)
+            {
+                diodMaterials.Add(mat);
+            }
         }
 
-        if (droneLight != null)
+        foreach (Material mat in diodMaterials)
         {
-            droneLight.color = Color.white;
-            droneLight.type = LightType.Point;
-            droneLight.intensity = 0.06f; 
-            droneLight.range = 0.08f;
-            droneLight.shadows = LightShadows.Soft;
+            mat.color = Color.white;
+            mat.SetColor("_EmissionColor", Color.white);
+            mat.EnableKeyword("_EMISSION");
         }
     }
 
     public void ChangeLightColor(Color newColor)
     {
-        if (droneLight != null)
+        foreach (Material mat in diodMaterials)
         {
-            droneLight.color = newColor;
-            droneLight.enabled = true;
+            mat.color = newColor;
+            mat.SetColor("_EmissionColor", newColor);
         }
     }
 }

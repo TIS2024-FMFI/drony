@@ -25,6 +25,7 @@ namespace Drony.dto
         public string Value { get; set; }
         public DroneMode DroneMode { get; set; }
         public Color Color { get; set; }
+        public TimeSpan Time {get; set; }
 
         
     }

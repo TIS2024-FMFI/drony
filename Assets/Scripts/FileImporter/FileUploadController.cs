@@ -9,6 +9,8 @@ public class FileUploadController : MonoBehaviour
     private string wallTexturePath;
     private string droneModelPath;
 
+    private bool AUTO_MODE = false;
+
     private Button uploadCommandFileButton;
     private Label commandFileNameLabel;
 
@@ -45,6 +47,15 @@ public class FileUploadController : MonoBehaviour
         uploadMusicFileButton = root.Q<Button>("upload-music-button");
         musicFileLabel = root.Q<Label>("upload-music-label");
         uploadMusicFileButton.clicked += () => OnUploadFile("Music File", new[] { new ExtensionFilter("Audio Files", "mp3", "wav", "ogg") }, ProcessMusicFile);
+    }
+
+    void Start()
+    {
+        if (AUTO_MODE)
+        {
+            uimanager.ProcessCommandFile("", AUTO_MODE);
+            commandFileNameLabel.text = uimanager.GetCommandFileName();
+        }
     }
 
     private void OnUploadFile(string title, ExtensionFilter[] extensions, System.Action<string> processFileCallback)

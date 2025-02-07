@@ -20,7 +20,6 @@ public class DroneLightController : MonoBehaviour
                 diodMaterials.Add(mat);
             }
         }
-        
 
         foreach (Material mat in diodMaterials)
         {

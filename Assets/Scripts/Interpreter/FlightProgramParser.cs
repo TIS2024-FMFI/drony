@@ -148,6 +148,8 @@ namespace Interpreter
                 Command.FlyCircle => ParseCircleTrajectoryArgs(argumentsList),
                 Command.DroneMode => ParseDroneModeArgs(argumentsList),
                 Command.SetColor => ParseSetColorArgs(argumentsList),
+                Command.Hover => ParseHoverArgs(argumentsList),
+                Command.Land => ParseLandArgs(argumentsList),
                 _ => new CmdArgumentsDTO()
             };
             
@@ -290,6 +292,20 @@ namespace Interpreter
             cmdArgumentsDTO.Color = new Color(r, g, b);
             return cmdArgumentsDTO;
 
+        }
+
+        private CmdArgumentsDTO ParseHoverArgs(List<string> args)
+        {
+            TimeSpan.TryParse(args[0], out var deltaTime);
+
+            CmdArgumentsDTO cmdArgumentsDTO = new CmdArgumentsDTO();
+            cmdArgumentsDTO.Time = deltaTime;
+            return cmdArgumentsDTO;
+        }
+
+        private CmdArgumentsDTO ParseLandArgs(List<string> args)
+        {
+            return new CmdArgumentsDTO();
         }
     }
 }

@@ -5,8 +5,9 @@ namespace DroneManager
 {
     public class DroneCollision : MonoBehaviour
     {
-        private void OnCollisionEnter(Collision collision)
+        void OnCollisionEnter(Collision collision)
         {
+            Debug.Log("collision");
             var panelController = CollisionWarningController.Instance;
             panelController.Show(name, collision.gameObject.name);
         }

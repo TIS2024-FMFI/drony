@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using Drony.Entities;
@@ -96,8 +97,8 @@ public class TrajectoryManager
             }  
             drones[droneId].setLastAsKeyState();
             UpdateTotalTime(droneId);
-            SetRemainingTrajectoryForAllDrones();
         }
+        SetRemainingTrajectoryForAllDrones();
     }
 
     private void SetRemainingTrajectoryForAllDrones()
@@ -121,7 +122,6 @@ public class TrajectoryManager
     }
     private void SetPosCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--SetPosCommand");
         drones[droneId] = trajectoryGenerator.SetInitialDronePosition(
                         drones[droneId],
                         timestamp,
@@ -129,7 +129,6 @@ public class TrajectoryManager
     }
     private void TakeOffCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--TakeOffCommand");
 
         DroneState lastState = drones[droneId].getLastAdded();
         Vector3 lastPosition = lastState.Position;
@@ -157,7 +156,6 @@ public class TrajectoryManager
     }
     private void FlyToCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--FlyToCommand");
         DroneState lastState = drones[droneId].getLastAdded();
         int timeLastStateEndPlusOne = lastState.Time + 1;
         int timeLinearTrajectoryStart = timestamp;
@@ -208,7 +206,6 @@ public class TrajectoryManager
     }
     private void FlyExactTrajectory(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--FlyExactTrajectoryCommand");
         DroneState lastState = drones[droneId].getLastAdded();
         int timeLastStateEndPlusOne = lastState.Time + 1;
         int timeTrajectoryStart = timestamp;
@@ -233,7 +230,6 @@ public class TrajectoryManager
     }
     private void FlyApproxTrajectory(string droneId, int timestamp, CmdArgumentsDTO cmdArguments, float smoothness)
     {
-        Debug.Log("--FlyApproxTrajectoryCommand");
         DroneState lastState = drones[droneId].getLastAdded();
         int timeLastStateEndPlusOne = lastState.Time + 1;
         int timeTrajectoryStart = timestamp;
@@ -358,7 +354,6 @@ public class TrajectoryManager
     }
     private void FlyCircleTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--FlyCircleTrajectoryCommand");
         DroneState lastState = drones[droneId].getLastAdded();
 
         Vector3 StartPosition = lastState.Position;
@@ -402,7 +397,6 @@ public class TrajectoryManager
     }
     private void FlySpiralTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--FlySpiralTrajectoryCommand");
         DroneState lastState = drones[droneId].getLastAdded();
 
         
@@ -433,17 +427,14 @@ public class TrajectoryManager
     }
     private void FlySinusTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--FlySinusTrajectoryCommand");
         throw new NotImplementedException("FlySinusTrajectoryCommand is not implemented yet.");
     }
     private void FlyParabolaTrajectoryCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--FlyParabolaTrajectoryCommand");
         throw new NotImplementedException("FlyParabolaTrajectoryCommand is not implemented yet.");
     }
     private void HoverCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--HoverCommand");
         int hoverTimeInMillis = (int)cmdArguments.Time.TotalMilliseconds;
         DroneState lastState = drones[droneId].getLastAdded();
         int timeLastStateEndPlusOne = lastState.Time + 1;
@@ -466,10 +457,9 @@ public class TrajectoryManager
     }
     private void SetColorCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--SetColorCommand");
         if (cmdArguments.Color == null)
         {
-            Debug.LogWarning($"No color specified for drone {droneId} at timestamp {timestamp}.");
+            UnityEngine.Debug.LogWarning($"No color specified for drone {droneId} at timestamp {timestamp}.");
         }
         Color newColor = cmdArguments.Color;
         DroneTrajectory droneTrajectory = drones[droneId];
@@ -483,7 +473,6 @@ public class TrajectoryManager
     }
     private void LandCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log("--LandCommand");
         DroneState lastState = drones[droneId].getLastAdded();
         int timeLastStateEndPlusOne = lastState.Time + 1;
         int timeHoverTrajectoryStart = timestamp;
@@ -510,7 +499,6 @@ public class TrajectoryManager
 
     private void DroneModeCommand(string droneId, int timestamp, CmdArgumentsDTO cmdArguments)
     {
-        Debug.Log($"--SetDroneMode: {cmdArguments.DroneMode}");
         drones[droneId].DroneMode = cmdArguments.DroneMode;
     }
     public DroneState GetCurrentDroneState(string droneId) {
